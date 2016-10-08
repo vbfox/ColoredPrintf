@@ -60,15 +60,16 @@ Task "RunTests" [ "Build"] <| fun _ ->
     let testAssemblies = artifactsDir </> "bin" </> "*.Tests" </> configuration </> "*.Tests.dll"
     let testResults = artifactsDir </> "TestResults.xml"
 
-    !! testAssemblies
-      |> NUnit3 (fun p ->
-          {p with
-             ToolPath = nunitPath
-             TimeOut = TimeSpan.FromMinutes 20.
-             DisposeRunners = true
-             ResultSpecs = [testResults] })
-
-    AppVeyor.UploadTestResultsFile AppVeyor.NUnit3 testResults
+    try
+        !! testAssemblies
+        |> NUnit3 (fun p ->
+            {p with
+                ToolPath = nunitPath
+                TimeOut = TimeSpan.FromMinutes 20.
+                DisposeRunners = true
+                ResultSpecs = [testResults] })
+    finally
+        AppVeyor.UploadTestResultsFile AppVeyor.NUnit3 testResults
 
 Task "NuGet" ["Build"] <| fun _ ->
     Paket.Pack <| fun p ->
