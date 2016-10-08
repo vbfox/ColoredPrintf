@@ -15,7 +15,7 @@ type TestWriter(initialFg: ConsoleColor, initialBg: ConsoleColor) =
     let mutable bg = initialBg
     let operations = List<Operation>()
 
-    interface ColoredPrinterEnv with
+    interface IColoredPrinterEnv with
         member __.Write (s: string) =
             operations.Add(Operation.Write(s))
         member __.Foreground

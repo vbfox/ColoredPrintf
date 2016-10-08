@@ -9,10 +9,7 @@ type ColorIdentifier =
     | Reset
     | Color of color : ConsoleColor
 
-type private onCharParsed<'st> = 'st -> char -> 'st
-type private onColorParsed<'st> = 'st -> ColorIdentifier * ColorIdentifier -> 'st
-
-type ColoredPrinterEnv =
+type IColoredPrinterEnv =
     abstract Write : string -> unit
     abstract Foreground : ConsoleColor with get,set
     abstract Background : ConsoleColor with get,set
@@ -25,44 +22,44 @@ open System.Text
 module ColoredString =
     type WriterStatus = | Normal | Foreground | Background | Escaping
     type WriterState = {
-        mutable colors: (ConsoleColor option * ConsoleColor option) list
-        mutable status: WriterStatus
-        currentText: StringBuilder
-        mutable currentForeground: ConsoleColor option
+        mutable Colors: (ConsoleColor option * ConsoleColor option) list
+        mutable Status: WriterStatus
+        CurrentText: StringBuilder
+        mutable CurrentForeground: ConsoleColor option
     }
 
     let getEmptyState () = {
-        colors = []
-        status = WriterStatus.Normal
-        currentText = StringBuilder()
-        currentForeground = None
+        Colors = []
+        Status = WriterStatus.Normal
+        CurrentText = StringBuilder()
+        CurrentForeground = None
     }
 
     let colorNameToColor (name: string) = Some(ConsoleColor.Red)
 
     module private StateHelpers =
-        let inline clearText (state: WriterState) = ignore(state.currentText.Clear())
-        let inline appendChar (c: char) (state: WriterState) = ignore(state.currentText.Append(c))    
+        let inline clearText (state: WriterState) = ignore(state.CurrentText.Clear())
+        let inline appendChar (c: char) (state: WriterState) = ignore(state.CurrentText.Append(c))    
 
-        let inline writeCurrentTextToEnv (env: ColoredPrinterEnv) (state: WriterState) =
-            if state.currentText.Length > 0 then
-                env.Write (state.currentText.ToString())
+        let inline writeCurrentTextToEnv (env: IColoredPrinterEnv) (state: WriterState) =
+            if state.CurrentText.Length > 0 then
+                env.Write (state.CurrentText.ToString())
                 state |> clearText
 
         let inline getColor (state: WriterState) = 
-            let colorText = state.currentText.ToString()
+            let colorText = state.CurrentText.ToString()
             state |> clearText
             colorNameToColor colorText
 
     open StateHelpers
 
-    let writeChar (env: ColoredPrinterEnv) (state: WriterState) (c: char) =
-        match state.status with
+    let writeChar (env: IColoredPrinterEnv) (state: WriterState) (c: char) =
+        match state.Status with
         | WriterStatus.Normal when c = '$' ->
             writeCurrentTextToEnv env state
-            state.status <- WriterStatus.Foreground
+            state.Status <- WriterStatus.Foreground
         | WriterStatus.Normal when c = ']' -> ()
-        | WriterStatus.Normal when c = '\\' -> state.status <- WriterStatus.Escaping
+        | WriterStatus.Normal when c = '\\' -> state.Status <- WriterStatus.Escaping
         | WriterStatus.Normal -> state |> appendChar c
         | WriterStatus.Escaping when c = '$' || c = ']' -> state |> appendChar c
         | WriterStatus.Escaping ->
@@ -70,28 +67,28 @@ module ColoredString =
             state |> appendChar c
         | WriterStatus.Foreground when c = ';' ->
             match getColor state with
-            | Some c -> state.currentForeground <- Some c
+            | Some c -> state.CurrentForeground <- Some c
             | None -> ()
-            state.status <- WriterStatus.Background
+            state.Status <- WriterStatus.Background
         | WriterStatus.Foreground when c = '[' ->
             match getColor state with
             | Some c ->
                 env.Foreground <- c
-                state.colors <- (Some c, None) :: state.colors
+                state.Colors <- (Some c, None) :: state.Colors
             | None -> ()
-            state.status <- WriterStatus.Normal
+            state.Status <- WriterStatus.Normal
         | WriterStatus.Foreground -> state |> appendChar c
         | WriterStatus.Background when c = '[' ->
-            let fg = state.currentForeground
-            state.currentForeground <- None
+            let fg = state.CurrentForeground
+            state.CurrentForeground <- None
             match fg with | Some c -> env.Foreground <- c | None -> ()
             let bg = getColor state
             match bg with | Some c -> env.Background <- c | None -> ()
-            state.status <- WriterStatus.Normal            
+            state.Status <- WriterStatus.Normal            
         | WriterStatus.Background -> state |> appendChar c
        
-    let finish (env: ColoredPrinterEnv) (state: WriterState) =
-        match state.status with
+    let finish (env: IColoredPrinterEnv) (state: WriterState) =
+        match state.Status with
         | WriterStatus.Normal ->
             writeCurrentTextToEnv env state
         | WriterStatus.Escaping ->
@@ -100,7 +97,7 @@ module ColoredString =
         | WriterStatus.Foreground -> ()
         | WriterStatus.Background -> ()
             
-    let writeCompleteString (env: ColoredPrinterEnv) (s: string) =
+    let writeCompleteString (env: IColoredPrinterEnv) (s: string) =
         let state = getEmptyState ()
         for i in 0..s.Length-1 do
             writeChar env state (s.[i])
