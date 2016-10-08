@@ -58,6 +58,14 @@ module SimpleTests =
         verify "Hello world" [Write("Hello world")]
 
     [<Test>]
+    let escapedRandomChar () =
+        verify "He\llo" [Write("He\llo")]
+
+    [<Test>]
+    let unescapedBrackedEnd () =
+        verify "Hello[]world" [Write("Hello[]world")]
+
+    [<Test>]
     let writeNothing () =
         verify "" []
 
@@ -128,6 +136,24 @@ module SimpleTests =
             [
                 SetForeground(ConsoleColor.Blue)
                 Write("world")
+                SetForeground(ConsoleColor.White)
+            ]
+
+    [<Test>]
+    let escapeStart () =
+        verify
+            "\$blue[world]"
+            [
+                Write("$blue[world]")
+            ]
+
+    [<Test>]
+    let escapeEnd () =
+        verify
+            "$blue[world\].]"
+            [
+                SetForeground(ConsoleColor.Blue)
+                Write("world].")
                 SetForeground(ConsoleColor.White)
             ]
 

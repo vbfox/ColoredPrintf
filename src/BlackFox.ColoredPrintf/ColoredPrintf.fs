@@ -68,10 +68,13 @@ module ColoredString =
         | WriterStatus.Normal when c = ']' -> ()
         | WriterStatus.Normal when c = '\\' -> state.Status <- WriterStatus.Escaping
         | WriterStatus.Normal -> state |> appendChar c
-        | WriterStatus.Escaping when c = '$' || c = ']' -> state |> appendChar c
+        | WriterStatus.Escaping when c = '$' || c = ']' ->
+            state |> appendChar c
+            state.Status <- WriterStatus.Normal
         | WriterStatus.Escaping ->
             state |> appendChar '\\'
             state |> appendChar c
+            state.Status <- WriterStatus.Normal
         | WriterStatus.Foreground when c = ';' ->
             match getColor state with
             | Some c -> state.CurrentForeground <- Some c
