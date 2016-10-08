@@ -11,9 +11,13 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TestApp", "src\TestApp\Test
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D4A1AD7D-5530-4FBE-AC0D-119D9AB6A1F7}"
 	ProjectSection(SolutionItems) = preProject
+		build\AppVeyorEx.fsx = build\AppVeyorEx.fsx
+		build\build.fsx = build\build.fsx
+		build\CmdLine.fs = build\CmdLine.fs
 		paket.dependencies = paket.dependencies
 		Readme.md = Readme.md
 		Release Notes.md = Release Notes.md
+		build\TaskDefinitionHelper.fsx = build\TaskDefinitionHelper.fsx
 	EndProjectSection
 EndProject
 Global

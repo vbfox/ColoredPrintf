@@ -58,9 +58,9 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="ColorStrings.fs" />
     <Compile Include="ColoredWriter.fs" />
+    <Compile Include="ColoredPrintf.fs" />
     <None Include="paket.references" />
     <None Include="paket.template" />
-    <Compile Include="ColoredPrintf.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
