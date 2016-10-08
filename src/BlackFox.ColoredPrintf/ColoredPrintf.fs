@@ -89,12 +89,22 @@ module ColoredString =
             match bg with | Some c -> env.Background <- c | None -> ()
             state.status <- WriterStatus.Normal            
         | WriterStatus.Background -> state |> appendChar c
+       
+    let finish (env: ColoredPrinterEnv) (state: WriterState) =
+        match state.status with
+        | WriterStatus.Normal ->
+            writeCurrentTextToEnv env state
+        | WriterStatus.Escaping ->
+            state |> appendChar '\\'
+            writeCurrentTextToEnv env state
+        | WriterStatus.Foreground -> ()
+        | WriterStatus.Background -> ()
             
     let writeCompleteString (env: ColoredPrinterEnv) (s: string) =
         let state = getEmptyState ()
         for i in 0..s.Length-1 do
             writeChar env state (s.[i])
-
+        finish env state
 (*
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]

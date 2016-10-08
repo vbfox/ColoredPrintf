@@ -56,3 +56,38 @@ module SimpleTests =
     [<Test>]
     let writeSingleString () =
         verify "Hello world" [Write("Hello world")]
+
+    [<Test>]
+    let writeFg () =
+        verify
+            "Hello $red[world]"
+            [
+                Write("Hello ")
+                SetForeground(ConsoleColor.Red)
+                Write("world")
+                SetForeground(ConsoleColor.White)
+            ]
+
+    [<Test>]
+    let writeBg () =
+        verify
+            "Hello $;red[world]"
+            [
+                Write("Hello ")
+                SetBackground(ConsoleColor.Red)
+                Write("world")
+                SetBackground(ConsoleColor.Black)
+            ]
+
+    [<Test>]
+    let writeFgAndBg () =
+        verify
+            "Hello $blue;red[world]"
+            [
+                Write("Hello ")
+                SetForeground(ConsoleColor.Blue)
+                SetBackground(ConsoleColor.Red)
+                Write("world")
+                SetForeground(ConsoleColor.White)
+                SetBackground(ConsoleColor.Black)
+            ]
