@@ -1,7 +1,8 @@
-﻿// Learn more about F# at http://fsharp.org
-// See the 'F# Tutorial' project for more help.
+﻿open System
+open BlackFox.ColoredPrintf
 
 [<EntryPoint>]
 let main argv = 
-    printfn "%A" argv
+    colorprintfn "$white;blue[%s ]$black;white[%s ]$white;red[%s]" "La vie" "est" "belle"
+    ignore(Console.ReadLine())
     0 // return an integer exit code
