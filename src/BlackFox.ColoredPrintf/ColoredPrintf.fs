@@ -1,19 +1,106 @@
 ﻿namespace BlackFox.ColoredPrintf
 
-type coloredString = { Raw : string }
+open System
 
+type ColoredString = { Raw : string }
+
+type ColorIdentifier =
+    | NoColor
+    | Reset
+    | Color of color : ConsoleColor
+
+type private onCharParsed<'st> = 'st -> char -> 'st
+type private onColorParsed<'st> = 'st -> ColorIdentifier * ColorIdentifier -> 'st
+
+type ColoredPrinterEnv =
+    abstract Write : string -> unit
+    abstract Foreground : ConsoleColor with get,set
+    abstract Background : ConsoleColor with get,set
+
+open System.Text
+
+// This is $red[%s]
+
+[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+module ColoredString =
+    type WriterStatus = | Normal | Foreground | Background | Escaping
+    type WriterState = {
+        mutable colors: (ConsoleColor option * ConsoleColor option) list
+        mutable status: WriterStatus
+        currentText: StringBuilder
+        mutable currentForeground: ConsoleColor option
+    }
+
+    let getEmptyState () = {
+        colors = []
+        status = WriterStatus.Normal
+        currentText = StringBuilder()
+        currentForeground = None
+    }
+
+    let colorNameToColor (name: string) = Some(ConsoleColor.Red)
+
+    module private StateHelpers =
+        let inline clearText (state: WriterState) = ignore(state.currentText.Clear())
+        let inline appendChar (c: char) (state: WriterState) = ignore(state.currentText.Append(c))    
+
+        let inline writeCurrentTextToEnv (env: ColoredPrinterEnv) (state: WriterState) =
+            if state.currentText.Length > 0 then
+                env.Write (state.currentText.ToString())
+                state |> clearText
+
+        let inline getColor (state: WriterState) = 
+            let colorText = state.currentText.ToString()
+            state |> clearText
+            colorNameToColor colorText
+
+    open StateHelpers
+
+    let writeChar (env: ColoredPrinterEnv) (state: WriterState) (c: char) =
+        match state.status with
+        | WriterStatus.Normal when c = '$' ->
+            writeCurrentTextToEnv env state
+            state.status <- WriterStatus.Foreground
+        | WriterStatus.Normal when c = ']' -> ()
+        | WriterStatus.Normal when c = '\\' -> state.status <- WriterStatus.Escaping
+        | WriterStatus.Normal -> state |> appendChar c
+        | WriterStatus.Escaping when c = '$' || c = ']' -> state |> appendChar c
+        | WriterStatus.Escaping ->
+            state |> appendChar '\\'
+            state |> appendChar c
+        | WriterStatus.Foreground when c = ';' ->
+            match getColor state with
+            | Some c -> state.currentForeground <- Some c
+            | None -> ()
+            state.status <- WriterStatus.Background
+        | WriterStatus.Foreground when c = '[' ->
+            match getColor state with
+            | Some c ->
+                env.Foreground <- c
+                state.colors <- (Some c, None) :: state.colors
+            | None -> ()
+            state.status <- WriterStatus.Normal
+        | WriterStatus.Foreground -> state |> appendChar c
+        | WriterStatus.Background when c = '[' ->
+            let fg = state.currentForeground
+            state.currentForeground <- None
+            match fg with | Some c -> env.Foreground <- c | None -> ()
+            let bg = getColor state
+            match bg with | Some c -> env.Background <- c | None -> ()
+            state.status <- WriterStatus.Normal            
+        | WriterStatus.Background -> state |> appendChar c
+            
+    let writeCompleteString (env: ColoredPrinterEnv) (s: string) =
+        let state = getEmptyState ()
+        for i in 0..s.Length-1 do
+            writeChar env state (s.[i])
+
+(*
 [<RequireQualifiedAccess>]
+[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module ColoredString =
     open System
     open System.Text
-
-    type private ColorIdentifier =
-        | NoColor
-        | Reset
-        | Color of color : ConsoleColor
-
-    type private onCharParsed<'st> = 'st -> char -> 'st
-    type private onColorParsed<'st> = 'st -> ColorIdentifier * ColorIdentifier -> 'st
 
     module Option =
         let orDefault default' option = defaultArg option default'
@@ -38,26 +125,7 @@ module ColoredString =
         (foreground, background)
 
     
-    let private fold (onChar: onCharParsed<'st>) (onColor: onColorParsed<'st>) (st:'st) coloredString = 
-        let foldFunc (st, escCount, content) c =
-            match escCount with
-            | 0 ->
-                match c with
-                | '^' -> (st, 1, "")
-                | _ -> (onChar st c, 0, "")
-            | 1 ->
-                match c with
-                | '[' -> (st, 2, "")
-                | _ -> (onChar st c, 0, "")
-            | 2 ->
-                match c with
-                | ']' -> (onColor st (parseColorCodes content), 0, "")
-                | _ -> (st, 2, content + (string)c)
-            | _ ->
-                failwith "Impossible escape count"
 
-        let (newSt, _, _) = coloredString.Raw |> Seq.fold foldFunc (st, 0, "")
-        newSt
 
     
     let length = fold (fun x _ -> x + 1) (fun x _ -> x) 0
@@ -126,3 +194,4 @@ module ColoredStringAutoOpen =
     let coloredWriteLine s =
         coloredWrite s
         Console.WriteLine()
+*)

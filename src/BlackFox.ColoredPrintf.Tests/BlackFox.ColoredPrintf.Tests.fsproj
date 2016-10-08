@@ -55,7 +55,7 @@
   -->
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Library1.fs" />
+    <Compile Include="SimpleTests.fs" />
     <None Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
@@ -63,6 +63,13 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BlackFox.ColoredPrintf\BlackFox.ColoredPrintf.fsproj">
+      <Name>BlackFox.ColoredPrintf</Name>
+      <Project>{860e1cc6-a7f8-4bc2-9a6c-ebe93360ece1}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v2.0' Or $(TargetFrameworkVersion) == 'v3.0' Or $(TargetFrameworkVersion) == 'v3.5')">
