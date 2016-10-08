@@ -35,7 +35,14 @@ module ColoredString =
         CurrentForeground = None
     }
 
-    let colorNameToColor (name: string) = Some(ConsoleColor.Red)
+    let private colorIdentifiers =
+        [
+            for color in Enum.GetValues(typedefof<ConsoleColor>) |> Seq.cast<ConsoleColor> do
+                yield color.ToString().ToLowerInvariant(), color
+        ]
+        |> Map.ofSeq
+
+    let colorNameToColor (name: string) = colorIdentifiers |> Map.tryFind(name.ToLowerInvariant())
 
     module private StateHelpers =
         let inline clearText (state: WriterState) = ignore(state.CurrentText.Clear())
