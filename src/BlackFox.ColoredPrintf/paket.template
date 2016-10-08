@@ -1,0 +1,18 @@
+type project
+id BlackFox.ColoredPrintf
+title BlackFox.ColoredPrintf
+owners Julien Roncaglia
+authors Julien Roncaglia
+tags F# FSharp printf
+projectUrl
+    https://github.com/vbfox/ColoredPrintf
+licenseUrl
+    https://github.com/vbfox/ColoredPrintf/blob/master/License.md
+requireLicenseAcceptance
+    false
+copyright
+    Copyright 2016
+summary
+    An F# library to allow using printf style strings in more places.
+description
+    An F# library to allow using printf style strings in more places.
