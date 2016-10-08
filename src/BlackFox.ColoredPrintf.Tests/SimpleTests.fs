@@ -58,7 +58,11 @@ module SimpleTests =
         verify "Hello world" [Write("Hello world")]
 
     [<Test>]
-    let writeFg () =
+    let writeNothing () =
+        verify "" []
+
+    [<Test>]
+    let writeFgAtEnd () =
         verify
             "Hello $red[world]"
             [
@@ -69,7 +73,19 @@ module SimpleTests =
             ]
 
     [<Test>]
-    let writeBg () =
+    let writeFg () =
+        verify
+            "Hello $red[world]."
+            [
+                Write("Hello ")
+                SetForeground(ConsoleColor.Red)
+                Write("world")
+                SetForeground(ConsoleColor.White)
+                Write(".")
+            ]
+
+    [<Test>]
+    let writeBgAtEnd () =
         verify
             "Hello $;red[world]"
             [
@@ -77,6 +93,18 @@ module SimpleTests =
                 SetBackground(ConsoleColor.Red)
                 Write("world")
                 SetBackground(ConsoleColor.Black)
+            ]
+
+    [<Test>]
+    let writeBg () =
+        verify
+            "Hello $;red[world]."
+            [
+                Write("Hello ")
+                SetBackground(ConsoleColor.Red)
+                Write("world")
+                SetBackground(ConsoleColor.Black)
+                Write(".")
             ]
 
     [<Test>]
@@ -90,4 +118,39 @@ module SimpleTests =
                 Write("world")
                 SetForeground(ConsoleColor.White)
                 SetBackground(ConsoleColor.Black)
+            ]
+
+
+    [<Test>]
+    let writeFullColor () =
+        verify
+            "$blue[world]"
+            [
+                SetForeground(ConsoleColor.Blue)
+                Write("world")
+                SetForeground(ConsoleColor.White)
+            ]
+
+    [<Test>]
+    let writeUnfinished () =
+        verify
+            "$blue[world"
+            [
+                SetForeground(ConsoleColor.Blue)
+                Write("world")
+                SetForeground(ConsoleColor.White)
+            ]
+
+    [<Test>]
+    let writeNested () =
+        verify
+            "$blue[Hello $red[world].]"
+            [
+                SetForeground(ConsoleColor.Blue)
+                Write("Hello ")
+                SetForeground(ConsoleColor.Red)
+                Write("world")
+                SetForeground(ConsoleColor.Blue)
+                Write(".")
+                SetForeground(ConsoleColor.White)
             ]

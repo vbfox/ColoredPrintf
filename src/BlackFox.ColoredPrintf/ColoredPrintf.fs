@@ -105,10 +105,15 @@ module ColoredString =
         | WriterStatus.Background -> ()
             
     let writeCompleteString (env: IColoredPrinterEnv) (s: string) =
+        let initialFg = env.Foreground
+        let initialBg = env.Background
+        
         let state = getEmptyState ()
-        for i in 0..s.Length-1 do
-            writeChar env state (s.[i])
+        for i in 0..s.Length-1 do writeChar env state (s.[i])
+        
         finish env state
+        if initialFg <> env.Foreground then env.Foreground <- initialFg
+        if initialBg <> env.Background then env.Background <- initialBg
 (*
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
