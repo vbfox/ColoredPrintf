@@ -15,12 +15,12 @@ copyright
 summary
     Provide a printf replacement with colors
 description
-	Provide a printf replacement with colors.
-
-	This library provide a colorprintf function where colors can be set for a range using the syntax :
-
-	$foreground;background[text]
-
-	For example:
-
-	colorprintf "Hello $red[%s]." "world"
+    Provide a printf replacement with colors.
+    
+    This library provide a colorprintf function where colors can be set for a range using the syntax :
+    
+    $foreground;background[text]
+    
+    For example:
+    
+    colorprintf "Hello $red[%s]." "world"
