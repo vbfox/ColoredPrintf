@@ -15,7 +15,7 @@ type TestWriter(initialFg: ConsoleColor, initialBg: ConsoleColor) =
     let mutable bg = initialBg
     let operations = List<Operation>()
 
-    interface IColoredPrinterEnv with
+    interface ColoredWriter.IColoredPrinterEnv with
         member __.Write (s: string) =
             operations.Add(Operation.Write(s))
         member __.Foreground
@@ -50,7 +50,7 @@ type TestWriter(initialFg: ConsoleColor, initialBg: ConsoleColor) =
 module SimpleTests =
     let verify s ops =
         let writer = TestWriter (ConsoleColor.White, ConsoleColor.Black)
-        ColoredString.writeCompleteString writer s
+        ColoredWriter.writeCompleteString writer s
         writer.Verify ops
 
     [<Test>]
