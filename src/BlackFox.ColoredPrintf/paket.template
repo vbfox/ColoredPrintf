@@ -13,6 +13,14 @@ requireLicenseAcceptance
 copyright
     Copyright 2016
 summary
-    An F# library to allow using printf style strings in more places.
+    Provide a printf replacement with colors
 description
-    An F# library to allow using printf style strings in more places.
+	Provide a printf replacement with colors.
+
+	This library provide a colorprintf function where colors can be set for a range using the syntax :
+
+	$foreground;background[text]
+
+	For example:
+
+	colorprintf "Hello $red[%s]." "world"
