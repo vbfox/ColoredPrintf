@@ -45,7 +45,11 @@ type private ColoredConsolePrintEnv<'Result>(k) =
 
     override __.Write(s : PrintableElement) =
         match s.ElementType with
-        | PrintableElementType.FromFormatSpecifier -> env.Write(s.FormatAsPrintF())
+        | PrintableElementType.FromFormatSpecifier ->
+            if typeof<ConsoleColor>.Equals(s.ValueType) && acceptColor(state) then
+                state |> writeColor (s.Value :?> ConsoleColor)
+            else
+                env.Write(s.FormatAsPrintF())
         | _ -> state |> writeString env (s.FormatAsPrintF())
         
     override __.WriteT(s : string) =

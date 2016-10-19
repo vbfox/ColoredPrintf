@@ -13,12 +13,14 @@ type WriterState = {
     mutable Colors: (ConsoleColor * ConsoleColor) list
     mutable Status: WriterStatus
     CurrentText: StringBuilder
+    mutable CurrentColor: ConsoleColor option
     mutable WipForeground: ConsoleColor option
 }
 
 let getEmptyState (foreground: ConsoleColor) (background: ConsoleColor) = {
     Colors = [foreground, background]
     Status = WriterStatus.Normal
+    CurrentColor = None
     CurrentText = StringBuilder()
     WipForeground = None
 }
@@ -33,12 +35,30 @@ module private StateHelpers =
             env.Write (state.CurrentText.ToString())
             state |> clearText
 
-    let inline getColor (state: WriterState) = 
-        let colorText = state.CurrentText.ToString()
-        state |> clearText
-        colorNameToColor colorText
+    let inline getColor (state: WriterState) =
+        match state.CurrentColor with
+        | Some _ as c ->
+            state.CurrentColor <- None
+            state |> clearText
+            c
+        | None ->
+            let colorText = state.CurrentText.ToString()
+            state |> clearText
+            colorNameToColor colorText
 
 open StateHelpers
+
+let inline acceptColor (state: WriterState) =
+    match state.Status with
+    | WriterStatus.Foreground -> state.CurrentColor.IsNone && state.CurrentText.Length = 0
+    | WriterStatus.Background -> state.CurrentColor.IsNone && state.CurrentText.Length = 0
+    | _ -> false
+
+let inline writeColor (color: ConsoleColor) (state: WriterState) =
+    if not (acceptColor state) then
+        failwith "Can't accept a color specification in the current state"
+    
+    state.CurrentColor <- Some color
 
 let inline writeChar (env: IColoredPrinterEnv) (c: char) (state: WriterState) =
     match state.Status with
