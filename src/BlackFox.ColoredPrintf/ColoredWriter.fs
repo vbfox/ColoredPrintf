@@ -28,8 +28,12 @@ let getEmptyState (foreground: ConsoleColor) (background: ConsoleColor) = {
 module private StateHelpers =
     open ColorStrings
     let inline clearText (state: WriterState) = ignore(state.CurrentText.Clear())
-    let inline appendChar (c: char) (state: WriterState) = ignore(state.CurrentText.Append(c))    
+    let inline appendChar (c: char) (state: WriterState) = ignore(state.CurrentText.Append(c))
+    let inline appendString (s: string) (state: WriterState) =
+        for i in 0..s.Length-1 do
+            state |> appendChar (s.[i])
 
+    /// Write the currently accumulated text if any and clear the text state
     let inline writeCurrentTextToEnv (env: IColoredPrinterEnv) (state: WriterState) =
         if state.CurrentText.Length > 0 then
             env.Write (state.CurrentText.ToString())
@@ -48,18 +52,21 @@ module private StateHelpers =
 
 open StateHelpers
 
-let inline acceptColor (state: WriterState) =
+/// Get if the current state can accept a color via 'writeColor'
+let inline canAcceptColor (state: WriterState) =
     match state.Status with
     | WriterStatus.Foreground -> state.CurrentColor.IsNone && state.CurrentText.Length = 0
     | WriterStatus.Background -> state.CurrentColor.IsNone && state.CurrentText.Length = 0
     | _ -> false
 
+/// Set the current (Foreground or Background) color
 let inline writeColor (color: ConsoleColor) (state: WriterState) =
-    if not (acceptColor state) then
+    if not (canAcceptColor state) then
         failwith "Can't accept a color specification in the current state"
     
     state.CurrentColor <- Some color
 
+/// Add a character to the current state (Can contain color markers)
 let inline writeChar (env: IColoredPrinterEnv) (c: char) (state: WriterState) =
     match state.Status with
     | WriterStatus.Normal when c = '$' ->
@@ -113,9 +120,21 @@ let inline writeChar (env: IColoredPrinterEnv) (c: char) (state: WriterState) =
         state.Status <- WriterStatus.Normal            
     | WriterStatus.Background -> state |> appendChar c
        
+/// Add a string to the current state (Can contain color markers)
 let inline writeString (env: IColoredPrinterEnv) (s: string) (state: WriterState) =
     for i in 0..s.Length-1 do
         state |> writeChar env (s.[i])
+
+/// Add a string to the current state verbatim (Color markers are ignored and will be present in the output)
+let inline writeEscapedString (s: string) (state: WriterState) =
+    match state.Status with
+    | WriterStatus.Normal ->
+        state |> appendString s
+    | WriterStatus.Escaping -> 
+        state |> appendChar '\\'
+        state |> appendString s
+    | WriterStatus.Foreground -> ()
+    | WriterStatus.Background -> ()
 
 let inline finish (env: IColoredPrinterEnv) (state: WriterState) =
     match state.Status with

@@ -20,7 +20,7 @@ type private ConsoleColoredPrinterEnv() =
             fg <- Console.ForegroundColor
             bg <- Console.BackgroundColor)
 
-    interface ColoredWriter.IColoredPrinterEnv with
+    interface IColoredPrinterEnv with
         member __.Write (s: string) = Console.Write(s)
         member __.Foreground
             with get () = fg
@@ -33,10 +33,9 @@ type private ConsoleColoredPrinterEnv() =
                 bg <- c
                 wrap(fun _ -> Console.BackgroundColor <- c)
 
-type private ColoredConsolePrintEnv<'Result>(k) =
+type internal ColoredConsolePrintEnv<'Result>(env: IColoredPrinterEnv, k) =
     inherit PrintfEnv<unit, string, 'Result>()
 
-    let env = ConsoleColoredPrinterEnv() :> ColoredWriter.IColoredPrinterEnv
     let state = getEmptyState env.Foreground env.Background
 
     override __.Finalize() : 'Result =
@@ -46,11 +45,12 @@ type private ColoredConsolePrintEnv<'Result>(k) =
     override __.Write(s : PrintableElement) =
         match s.ElementType with
         | PrintableElementType.FromFormatSpecifier ->
-            if typeof<ConsoleColor>.Equals(s.ValueType) && acceptColor(state) then
+            if typeof<ConsoleColor>.Equals(s.ValueType) && canAcceptColor(state) then
                 state |> writeColor (s.Value :?> ConsoleColor)
             else
-                env.Write(s.FormatAsPrintF())
-        | _ -> state |> writeString env (s.FormatAsPrintF())
+                state |> writeEscapedString (s.FormatAsPrintF())
+        | _ ->
+            state |> writeString env (s.FormatAsPrintF())
         
     override __.WriteT(s : string) =
         env.Write(s)
@@ -58,8 +58,8 @@ type private ColoredConsolePrintEnv<'Result>(k) =
 type ColorPrintFormat<'T> = Format<'T, unit, string, unit>
 
 let colorprintf<'T> (format: ColorPrintFormat<'T>) =
-    doPrintfFromEnv format (ColoredConsolePrintEnv(id))
+    doPrintfFromEnv format (ColoredConsolePrintEnv(ConsoleColoredPrinterEnv(), id))
 
 let colorprintfn<'T> (format: ColorPrintFormat<'T>) =
     let writeLine () = Console.WriteLine()
-    doPrintfFromEnv format (ColoredConsolePrintEnv(writeLine))
+    doPrintfFromEnv format (ColoredConsolePrintEnv(ConsoleColoredPrinterEnv(), writeLine))
