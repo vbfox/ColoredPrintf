@@ -1,151 +1,140 @@
 ﻿module BlackFox.ColoredPrintf.Tests.SimpleTests
 open System
 open BlackFox.ColoredPrintf.Tests.TestWriter
-open NUnit.Framework
+open Expecto
 
-[<Test>]
-let writeSingleString () =
-    verify "Hello world" [Write("Hello world")]
+[<Tests>]
+let simpleTests =
+    testList "Simple tests" [
 
-[<Test>]
-let escapedRandomChar () =
-    verify "He\llo" [Write("He\llo")]
+        testCase "Single string" <| fun _ ->
+            verify "Hello world" [Write("Hello world")]
 
-[<Test>]
-let unescapedBrackedEnd () =
-    verify "Hello[]world" [Write("Hello[]world")]
+        testCase "Escape random char" <| fun _ ->
+            verify "He\llo" [Write("He\llo")]
 
-[<Test>]
-let writeNothing () =
-    verify "" []
+        testCase "Unescaped bracket end" <| fun _ ->
+            verify "Hello[]world" [Write("Hello[]world")]
 
-[<Test>]
-let writeFgAtEnd () =
-    verify
-        "Hello $red[world]"
-        [
-            Write("Hello ")
-            SetForeground(ConsoleColor.Red)
-            Write("world")
-            SetForeground(ConsoleColor.White)
-        ]
+        testCase "Nothing" <| fun _ ->
+            verify "" []
 
-[<Test>]
-let writeFg () =
-    verify
-        "Hello $red[world]."
-        [
-            Write("Hello ")
-            SetForeground(ConsoleColor.Red)
-            Write("world")
-            SetForeground(ConsoleColor.White)
-            Write(".")
-        ]
+        testCase "Fg at end" <| fun _ ->
+            verify
+                "Hello $red[world]"
+                [
+                    Write("Hello ")
+                    SetForeground(ConsoleColor.Red)
+                    Write("world")
+                    SetForeground(ConsoleColor.White)
+                ]
 
-[<Test>]
-let writeBgAtEnd () =
-    verify
-        "Hello $;red[world]"
-        [
-            Write("Hello ")
-            SetBackground(ConsoleColor.Red)
-            Write("world")
-            SetBackground(ConsoleColor.Black)
-        ]
+        testCase "Fg" <| fun _ ->
+            verify
+                "Hello $red[world]."
+                [
+                    Write("Hello ")
+                    SetForeground(ConsoleColor.Red)
+                    Write("world")
+                    SetForeground(ConsoleColor.White)
+                    Write(".")
+                ]
 
-[<Test>]
-let writeBg () =
-    verify
-        "Hello $;red[world]."
-        [
-            Write("Hello ")
-            SetBackground(ConsoleColor.Red)
-            Write("world")
-            SetBackground(ConsoleColor.Black)
-            Write(".")
-        ]
+        testCase "Bg at end" <| fun _ ->
+            verify
+                "Hello $;red[world]"
+                [
+                    Write("Hello ")
+                    SetBackground(ConsoleColor.Red)
+                    Write("world")
+                    SetBackground(ConsoleColor.Black)
+                ]
 
-[<Test>]
-let writeFgAndBg () =
-    verify
-        "Hello $blue;red[world]"
-        [
-            Write("Hello ")
-            SetForeground(ConsoleColor.Blue)
-            SetBackground(ConsoleColor.Red)
-            Write("world")
-            SetForeground(ConsoleColor.White)
-            SetBackground(ConsoleColor.Black)
-        ]
+        testCase "Bg" <| fun _ ->
+            verify
+                "Hello $;red[world]."
+                [
+                    Write("Hello ")
+                    SetBackground(ConsoleColor.Red)
+                    Write("world")
+                    SetBackground(ConsoleColor.Black)
+                    Write(".")
+                ]
+
+        testCase "Fg and Bg" <| fun _ ->
+            verify
+                "Hello $blue;red[world]"
+                [
+                    Write("Hello ")
+                    SetForeground(ConsoleColor.Blue)
+                    SetBackground(ConsoleColor.Red)
+                    Write("world")
+                    SetForeground(ConsoleColor.White)
+                    SetBackground(ConsoleColor.Black)
+                ]
 
 
-[<Test>]
-let writeFullColor () =
-    verify
-        "$blue[world]"
-        [
-            SetForeground(ConsoleColor.Blue)
-            Write("world")
-            SetForeground(ConsoleColor.White)
-        ]
+        testCase "Full color" <| fun _ ->
+            verify
+                "$blue[world]"
+                [
+                    SetForeground(ConsoleColor.Blue)
+                    Write("world")
+                    SetForeground(ConsoleColor.White)
+                ]
 
-[<Test>]
-let escapeStart () =
-    verify
-        "\$blue[world]"
-        [
-            Write("$blue[world]")
-        ]
+        testCase "Escape start" <| fun _ ->
+            verify
+                "\$blue[world]"
+                [
+                    Write("$blue[world]")
+                ]
 
-[<Test>]
-let escapeEnd () =
-    verify
-        "$blue[world\].]"
-        [
-            SetForeground(ConsoleColor.Blue)
-            Write("world].")
-            SetForeground(ConsoleColor.White)
-        ]
+        testCase "Escape end" <| fun _ ->
+            verify
+                "$blue[world\].]"
+                [
+                    SetForeground(ConsoleColor.Blue)
+                    Write("world].")
+                    SetForeground(ConsoleColor.White)
+                ]
 
-[<Test>]
-let writeUnfinished () =
-    verify
-        "$blue[world"
-        [
-            SetForeground(ConsoleColor.Blue)
-            Write("world")
-            SetForeground(ConsoleColor.White)
-        ]
+        testCase "Unfinished" <| fun _ ->
+            verify
+                "$blue[world"
+                [
+                    SetForeground(ConsoleColor.Blue)
+                    Write("world")
+                    SetForeground(ConsoleColor.White)
+                ]
 
-[<Test>]
-let writeNested () =
-    verify
-        "$blue[Hello $red[world].]"
-        [
-            SetForeground(ConsoleColor.Blue)
-            Write("Hello ")
-            SetForeground(ConsoleColor.Red)
-            Write("world")
-            SetForeground(ConsoleColor.Blue)
-            Write(".")
-            SetForeground(ConsoleColor.White)
-        ]
+        testCase "Nested" <| fun _ ->
+            verify
+                "$blue[Hello $red[world].]"
+                [
+                    SetForeground(ConsoleColor.Blue)
+                    Write("Hello ")
+                    SetForeground(ConsoleColor.Red)
+                    Write("world")
+                    SetForeground(ConsoleColor.Blue)
+                    Write(".")
+                    SetForeground(ConsoleColor.White)
+                ]
 
-[<Test>]
-let verySimplePrintf () =
-    verifyprintf
-        [
-            Write("Hello world")
-        ]
-        "Hello world"
+        testCase "Simple printf" <| fun _ ->
+            verifyprintf
+                [
+                    Write("Hello world")
+                ]
+                "Hello world"
 
-[<Test>]
-let colorPrintF () =
-    verifyprintf
-        [
-            Write("Hello ")
-            SetForeground(ConsoleColor.Red)
-            Write("world")
-            SetForeground(ConsoleColor.White)
-        ]
-        "Hello $red[world]"
+        testCase "color printf" <| fun _ ->
+            verifyprintf
+                [
+                    Write("Hello ")
+                    SetForeground(ConsoleColor.Red)
+                    Write("world")
+                    SetForeground(ConsoleColor.White)
+                ]
+                "Hello $red[world]"
+    ]

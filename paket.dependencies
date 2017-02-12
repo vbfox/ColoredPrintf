@@ -4,6 +4,5 @@ source https://api.nuget.org/v3/index.json
 nuget FAKE
 nuget FSharp.Core ~> 4
 nuget BlackFox.MasterOfFoo ~> 0.2
-nuget NUnit
-nuget NUnit.ConsoleRunner
+nuget Expecto
 github fsharp/FAKE modules/Octokit/Octokit.fsx

@@ -1,8 +1,13 @@
 NUGET
   remote: http://api.nuget.org/v3/index.json
+    Argu (3.2)
     BlackFox.MasterOfFoo (0.2)
       FSharp.Core (>= 4.0 < 5.0)
       FSharpLint.MSBuild
+    Expecto (3.2.1)
+      Argu (>= 3.2)
+      FSharp.Core (>= 3.1.2.5)
+      Mono.Cecil (>= 0.9.6.4)
     FAKE (4.41.8)
     FSharp.Core (4.0.0.1)
     FSharpLint.MSBuild (0.4.9)
@@ -12,11 +17,10 @@ NUGET
     Microsoft.Net.Http (2.2.29) - framework: net10, net11, net20, net30, net35, net40, net40-full
       Microsoft.Bcl (>= 1.1.10)
       Microsoft.Bcl.Build (>= 1.0.14)
-    NUnit (3.5)
-    NUnit.ConsoleRunner (3.5)
+    Mono.Cecil (0.9.6.4)
     Octokit (0.23)
       Microsoft.Net.Http  - framework: net10, net11, net20, net30, net35, net40, net40-full
 GITHUB
   remote: fsharp/FAKE
-    modules/Octokit/Octokit.fsx (4e4428bfe931a5f720e32f9d69289d25eb16d467)
+    modules/Octokit/Octokit.fsx (e842705560e95dd75dd2c6a78fb1ae62db545297)
       Octokit (>= 0.20)

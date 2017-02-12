@@ -3,8 +3,8 @@
 open System
 open System.Collections.Generic
 open BlackFox.ColoredPrintf
-open NUnit.Framework
 open BlackFox.MasterOfFoo
+open Expecto
 
 type Operation =
     | Write of string
@@ -34,22 +34,12 @@ type TestWriterImpl(initialFg: ConsoleColor, initialBg: ConsoleColor) =
         try
             let mutable i = 0
             for expectedOperation in expectedOperations do
-                if operations.Count < i + 1 then
-                    Assert.Fail (sprintf "Expected %ith operation to be %A but nothing found" (i+1) expectedOperation)
-                match expectedOperation, operations.[i] with
-                | Write s1, Write s2 ->
-                    Assert.AreEqual(s1, s2, sprintf "Operation %i: The two operations didn't write the same text" (i+1))
-                | SetForeground c1, SetForeground c2 ->
-                    Assert.AreEqual(c1, c2, sprintf "Operation %i: The two operations didn't set the same foreground" (i+1))
-                | SetBackground c1, SetBackground c2 ->
-                    Assert.AreEqual(c1, c2, sprintf "Operation %i: The two operations didn't set the same background" (i+1))
-                | op1, op2 -> 
-                    Assert.Fail (sprintf "Operation %i: The two operations aren't of the same type: %A and %A" (i+1) op1 op2)
+                Expect.isLessThanOrEqual (i+1) (operations.Count) (sprintf "%ith operation exists (%A)" (i+1) expectedOperation)
+                Expect.equal expectedOperation (operations.[i]) (sprintf "Operation %i: The two operations are equal: %A and %A" (i+1) expectedOperation (operations.[i]))
                 i <- i + 1
-            if i <> operations.Count  then
-                Assert.Fail(sprintf "More operations that expected, for example: %A" operations.[i])
+            Expect.equal i (operations.Count) "The same number of operations should be present"
         with
-        | :? AssertionException ->
+        | _ ->
             let expected = expectedOperations |> List.ofSeq
             let actual = operations |> List.ofSeq
             printfn "Expected: %A" expected
