@@ -6,7 +6,7 @@
 open System
 open Fake
 open Fake.ReleaseNotesHelper
-open Fake.Testing.NUnit3
+open Fake.Testing.Expecto
 open BlackFox
 
 let configuration = environVarOrDefault "configuration" "Release"
@@ -56,20 +56,15 @@ Task "Build" ["Init"; "?Clean"] <| fun _ ->
         |> ignore
 
 Task "RunTests" [ "Build"] <| fun _ ->
-    let nunitPath = rootDir </> @"packages" </> "NUnit.ConsoleRunner" </> "tools" </> "nunit3-console.exe"
-    let testAssemblies = artifactsDir </> "bin" </> "*.Tests" </> configuration </> "*.Tests.dll"
-    let testResults = artifactsDir </> "TestResults.xml"
-
+    let testAssemblies = artifactsDir </> "bin" </> "*.Tests" </> configuration </> "*.Tests.exe"
+    // let testResults = artifactsDir </> "TestResults.xml"
+    
     try
         !! testAssemblies
-        |> NUnit3 (fun p ->
-            {p with
-                ToolPath = nunitPath
-                TimeOut = TimeSpan.FromMinutes 20.
-                DisposeRunners = true
-                ResultSpecs = [testResults] })
+        |> Expecto (fun p -> { p with Summary = false; PrintVersion = false })
     finally
-        AppVeyor.UploadTestResultsFile AppVeyor.NUnit3 testResults
+        ()
+        // AppVeyor.UploadTestResultsFile AppVeyor.NUnit3 testResults
 
 Task "NuGet" ["Build"] <| fun _ ->
     Paket.Pack <| fun p ->

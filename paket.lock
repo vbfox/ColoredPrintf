@@ -8,9 +8,9 @@ NUGET
       Argu (>= 3.2)
       FSharp.Core (>= 3.1.2.5)
       Mono.Cecil (>= 0.9.6.4)
-    FAKE (4.41.8)
+    FAKE (4.50)
     FSharp.Core (4.0.0.1)
-    FSharpLint.MSBuild (0.4.9)
+    FSharpLint.MSBuild (0.4.11)
     Microsoft.Bcl (1.1.10) - framework: net10, net11, net20, net30, net35, net40, net40-full
       Microsoft.Bcl.Build (>= 1.0.14)
     Microsoft.Bcl.Build (1.0.21) - import_targets: false, framework: net10, net11, net20, net30, net35, net40, net40-full
@@ -18,7 +18,7 @@ NUGET
       Microsoft.Bcl (>= 1.1.10)
       Microsoft.Bcl.Build (>= 1.0.14)
     Mono.Cecil (0.9.6.4)
-    Octokit (0.23)
+    Octokit (0.24)
       Microsoft.Net.Http  - framework: net10, net11, net20, net30, net35, net40, net40-full
 GITHUB
   remote: fsharp/FAKE
