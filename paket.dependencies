@@ -1,8 +1,15 @@
-version 3.25.1
+version 5.138.0
 
 source https://api.nuget.org/v3/index.json
+
+framework: >= net45
+
 nuget FAKE
 nuget FSharp.Core ~> 4
-nuget BlackFox.MasterOfFoo ~> 0.2
+nuget BlackFox.MasterOfFoo ~> 1
 nuget Expecto
 github fsharp/FAKE modules/Octokit/Octokit.fsx
+nuget FSharp.Data
+
+github vbfox/FoxSharp src/BlackFox.FoxSharp/CommandLine.fs
+github vbfox/FoxSharp src/BlackFox.FakeUtils/TypedTaskDefinitionHelper.fs

@@ -51,11 +51,22 @@ type internal ColoredConsolePrintEnv<'Result>(env: IColoredPrinterEnv, k) =
                 state |> writeEscapedString (s.FormatAsPrintF())
         | _ ->
             state |> writeString env (s.FormatAsPrintF())
-        
+
     override __.WriteT(s : string) =
         env.Write(s)
 
 type ColorPrintFormat<'T> = Format<'T, unit, string, unit>
+
+/// I'm so <c>.Net</c> very using <paramref name="s" />
+/// You can also see <see cref="T:ColoredConsolePrintEnv`1" />.
+/// <example>
+/// <code>
+/// override __.Finalize() : 'Result =
+///         state |> finish env
+///         k()
+/// </code>
+/// </example>
+let foo = ()
 
 let colorprintf<'T> (format: ColorPrintFormat<'T>) =
     doPrintfFromEnv format (ColoredConsolePrintEnv(ConsoleColoredPrinterEnv(), id))
@@ -63,3 +74,4 @@ let colorprintf<'T> (format: ColorPrintFormat<'T>) =
 let colorprintfn<'T> (format: ColorPrintFormat<'T>) =
     let writeLine () = Console.WriteLine()
     doPrintfFromEnv format (ColoredConsolePrintEnv(ConsoleColoredPrinterEnv(), writeLine))
+

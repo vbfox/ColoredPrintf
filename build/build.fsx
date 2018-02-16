@@ -1,6 +1,6 @@
 // include Fake libs
 #r "../packages/FAKE/tools/FakeLib.dll"
-#load "./TaskDefinitionHelper.fsx"
+#load "../paket-files/vbfox/FoxSharp/src/BlackFox.FakeUtils/TypedTaskDefinitionHelper.fs"
 #load "./AppVeyorEx.fsx"
 
 open System
@@ -8,6 +8,7 @@ open Fake
 open Fake.ReleaseNotesHelper
 open Fake.Testing.Expecto
 open BlackFox
+open BlackFox.TypedTaskDefinitionHelper
 
 let configuration = environVarOrDefault "configuration" "Release"
 
@@ -44,29 +45,32 @@ let release =
 
 AppVeyorEx.updateBuild (fun info -> { info with Version = Some release.AssemblyVersion })
 
-Task "Init" [] <| fun _ ->
+let init = task "Init" [] {
     CreateDir artifactsDir
+}
 
-// Targets
-Task "Clean" ["Init"] <| fun _ ->
+let clean = task "Clean" [init] {
     CleanDirs [artifactsDir]
+}
 
-Task "Build" ["Init"; "?Clean"] <| fun _ ->
+let build = task "Build" [init; clean.IfNeeded] {
     MSBuild null "Build" ["Configuration", configuration] projects
         |> ignore
+}
 
-Task "RunTests" [ "Build"] <| fun _ ->
+let runTests = task "RunTests" [build] {
     let testAssemblies = artifactsDir </> "bin" </> "*.Tests" </> configuration </> "*.Tests.exe"
     // let testResults = artifactsDir </> "TestResults.xml"
-    
+
     try
         !! testAssemblies
         |> Expecto (fun p -> { p with Summary = false; PrintVersion = false })
     finally
         ()
         // AppVeyor.UploadTestResultsFile AppVeyor.NUnit3 testResults
+}
 
-Task "NuGet" ["Build"] <| fun _ ->
+let nuget = task "NuGet" [build] {
     Paket.Pack <| fun p ->
         { p with
             OutputPath = artifactsDir
@@ -76,28 +80,31 @@ Task "NuGet" ["Build"] <| fun _ ->
             BuildConfig = configuration
             BuildPlatform = "AnyCPU"}
     AppVeyor.PushArtifacts (from artifactsDir ++ "*.nupkg")
+}
 
-Task "PublishNuget" ["NuGet"] <| fun _ ->
+let publishNuget = task "PublishNuget" [nuget] {
     let key =
         match environVarOrNone "nuget-key" with
         | Some(key) -> key
         | None -> getUserPassword "NuGet key: "
 
     Paket.Push <| fun p ->  { p with WorkingDir = artifactsDir; ApiKey = key }
+}
 
 let zipFile = artifactsDir </> (sprintf "BlackFox.ColoredPrintf-%s.zip" release.NugetVersion)
 
-Task "Zip" ["Build"] <| fun _ ->
+let zip = task "Zip" [build] {
     from libraryBinDir
         ++ "**/*.dll"
         ++ "**/*.xml"
         -- "**/FSharp.Core.*"
         |> Zip libraryBinDir zipFile
     AppVeyor.PushArtifacts [zipFile]
+}
 
 #load "../paket-files/fsharp/FAKE/modules/Octokit/Octokit.fsx"
 
-Task "GitHubRelease" ["Zip"] <| fun _ ->
+let githubRelease = task "GitHubRelease" [zip] {
     let user =
         match getBuildParam "github-user" with
         | s when not (String.IsNullOrWhiteSpace s) -> s
@@ -113,8 +120,9 @@ Task "GitHubRelease" ["Zip"] <| fun _ ->
     |> Octokit.uploadFile zipFile
     |> Octokit.releaseDraft
     |> Async.RunSynchronously
+}
 
-Task "GitRelease" [] <| fun _ ->
+let gitRelease = task "GitRelease" [] {
     let remote =
         Git.CommandHelper.getGitResult "" "remote -v"
         |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
@@ -123,9 +131,10 @@ Task "GitRelease" [] <| fun _ ->
 
     Git.Branches.tag "" release.NugetVersion
     Git.Branches.pushTag "" remote release.NugetVersion
+}
 
-Task "Default" ["RunTests"] DoNothing
-Task "Release" ["Clean"; "GitRelease"; "GitHubRelease"; "PublishNuget"] DoNothing
-Task "CI" ["Clean"; "RunTests"; "Zip"; "NuGet"] DoNothing
+let defaultTask = EmptyTask "Default" [runTests]
+EmptyTask "Release" [clean; gitRelease; githubRelease; publishNuget]
+EmptyTask "CI" [clean; runTests; zip; nuget]
 
-RunTaskOrDefault "Default"
+RunTaskOrDefault defaultTask

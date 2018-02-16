@@ -63,7 +63,7 @@ let inline canAcceptColor (state: WriterState) =
 let inline writeColor (color: ConsoleColor) (state: WriterState) =
     if not (canAcceptColor state) then
         failwith "Can't accept a color specification in the current state"
-    
+
     state.CurrentColor <- Some color
 
 /// Add a character to the current state (Can contain color markers)
@@ -107,19 +107,19 @@ let inline writeChar (env: IColoredPrinterEnv) (c: char) (state: WriterState) =
     | WriterStatus.Foreground -> state |> appendChar c
     | WriterStatus.Background when c = '[' ->
         let (currentFg, currentBg) = state.Colors.Head
-            
+
         let fg = defaultArg state.WipForeground currentFg
         let bg = defaultArg (getColor state) currentBg
-            
+
         state.WipForeground <- None
 
         if currentFg <> fg then env.Foreground <- fg
         if currentBg <> bg then env.Background <- bg
 
         state.Colors <- (fg, bg) :: state.Colors
-        state.Status <- WriterStatus.Normal            
+        state.Status <- WriterStatus.Normal
     | WriterStatus.Background -> state |> appendChar c
-       
+
 /// Add a string to the current state (Can contain color markers)
 let inline writeString (env: IColoredPrinterEnv) (s: string) (state: WriterState) =
     for i in 0..s.Length-1 do
@@ -130,7 +130,7 @@ let inline writeEscapedString (s: string) (state: WriterState) =
     match state.Status with
     | WriterStatus.Normal ->
         state |> appendString s
-    | WriterStatus.Escaping -> 
+    | WriterStatus.Escaping ->
         state |> appendChar '\\'
         state |> appendString s
     | WriterStatus.Foreground -> ()
@@ -149,7 +149,7 @@ let inline finish (env: IColoredPrinterEnv) (state: WriterState) =
     let (initialFg, initialBg) = state.Colors |> List.last
     if initialFg <> env.Foreground then env.Foreground <- initialFg
     if initialBg <> env.Background then env.Background <- initialBg
-            
+
 let writeCompleteString (env: IColoredPrinterEnv) (s: string) =
     let state = getEmptyState (env.Foreground) (env.Background)
     state |> writeString env s
