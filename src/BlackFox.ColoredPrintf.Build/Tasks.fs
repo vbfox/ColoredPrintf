@@ -1,4 +1,4 @@
-module BlackFox.MasterOfFoo.Build.Tasks
+module BlackFox.ColoredPrintf.Build.Tasks
 
 open Fake.Api
 open Fake.BuildServer
@@ -29,9 +29,8 @@ let createAndGetDefault () =
     let rootDir = System.IO.Path.GetFullPath(__SOURCE_DIRECTORY__ </> ".." </> "..")
     let srcDir = rootDir </> "src"
     let artifactsDir = rootDir </> "artifacts"
-    let binDir = artifactsDir </> "bin"
     let libraryProjectFile = srcDir </> "BlackFox.ColoredPrintf" </> "BlackFox.ColoredPrintf.fsproj"
-    let libraryBinDir = binDir </> "BlackFox.ColoredPrintf" </> configuration
+    let libraryBinDir = artifactsDir </> "BlackFox.ColoredPrintf" </> configuration
     let solutionFile = rootDir </> "BlackFox.ColoredPrintf.sln"
     let projects =
         from srcDir
@@ -100,7 +99,7 @@ let createAndGetDefault () =
                 })
     }
 
-    let nupkgDir = artifactsDir </> "BlackFox.MasterOfFoo" </> configuration
+    let nupkgDir = artifactsDir </> "BlackFox.ColoredPrintf" </> configuration
 
     let nuget = task "NuGet" [build] {
         DotNet.pack
@@ -108,7 +107,7 @@ let createAndGetDefault () =
             libraryProjectFile
         let nupkgFile =
             nupkgDir
-                </> (sprintf "BlackFox.MasterOfFoo.%s.nupkg" release.NugetVersion)
+                </> (sprintf "BlackFox.ColoredPrintf.%s.nupkg" release.NugetVersion)
 
         Trace.publish ImportData.BuildArtifact nupkgFile
     }

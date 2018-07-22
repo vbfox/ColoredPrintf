@@ -1,4 +1,4 @@
-﻿module BlackFox.MasterOfFoo.Build.Program
+﻿module BlackFox.ColoredPrintf.Build.Program
 
 open BlackFox.TypedTaskDefinitionHelper
 open Fake.Core
@@ -17,7 +17,7 @@ let setupFakeContext (argv: string list) =
 let main argv =
     setupFakeContext (List.ofArray argv)
     BuildServer.install [ AppVeyor.Installer ]
-    
+
     let defaultTask = Tasks.createAndGetDefault ()
     RunTaskOrDefault defaultTask
     0
