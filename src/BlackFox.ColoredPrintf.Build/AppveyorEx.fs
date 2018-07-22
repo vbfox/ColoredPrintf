@@ -1,17 +1,17 @@
-module BlackFox.AppVeyorEx
+﻿module BlackFox.AppVeyorEx
 
-#r "../packages/FAKE/tools/FakeLib.dll"
-#load "../paket-files/vbfox/FoxSharp/src/BlackFox.FoxSharp/CommandLine.fs"
-
+open Fake.Core
 open BlackFox.CommandLine
-open Fake
-open System.IO
 
 let private sendToAppVeyor args =
-    ExecProcess (fun info ->
-        info.FileName <- "appveyor"
-        info.Arguments <- args) (System.TimeSpan.MaxValue)
-    |> ignore
+    Process.execSimple
+        (fun info ->
+            { info with
+                FileName = "appveyor"
+                Arguments = args
+            })
+        (System.TimeSpan.MaxValue)
+        |> ignore
 
 type BuildInfo = {
     Version: string option
@@ -43,7 +43,7 @@ let updateBuild (setBuildInfo : BuildInfo -> BuildInfo) =
             |> CmdLine.append name
             |> CmdLine.append (transform value)
         | None -> cmdLine
-    if buildServer = BuildServer.AppVeyor then
+    if BuildServer.buildServer = BuildServer.AppVeyor then
         let info = setBuildInfo defaultBuildInfo
         let cmdLine =
             CmdLine.empty

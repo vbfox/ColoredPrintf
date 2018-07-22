@@ -1,8 +1,8 @@
 @echo off
 
-paket.exe restore
+paket.exe restore -s
 if errorlevel 1 (
   exit /b %errorlevel%
 )
 
-packages\FAKE\tools\FAKE.exe build\build.fsx %*
+dotnet run --project src\BlackFox.ColoredPrintf.Build\BlackFox.ColoredPrintf.Build.fsproj %*

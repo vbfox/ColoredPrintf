@@ -1,0 +1,21 @@
+group build
+    FSharp.Core
+
+    Fake.Core.Environment
+    Fake.Core.Process
+    Fake.Core.Trace
+    Fake.Core.Target
+    Fake.Core.ReleaseNotes
+    Fake.Core.UserInput
+    Fake.IO.FileSystem
+    Fake.IO.Zip
+    Fake.Tools.Git
+    Fake.DotNet.Cli
+    Fake.DotNet.AssemblyInfoFile
+    Fake.DotNet.Testing.Expecto
+    Fake.DotNet.MsBuild
+    Fake.DotNet.Paket
+    Fake.BuildServer.AppVeyor
+    Fake.Api.GitHub
+
+    File: CommandLine.fs

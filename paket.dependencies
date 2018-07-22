@@ -32,3 +32,5 @@ group build
     nuget Fake.DotNet.Paket
     nuget Fake.BuildServer.AppVeyor
     nuget Fake.Api.GitHub
+
+    github vbfox/FoxSharp src/BlackFox.FoxSharp/CommandLine.fs
