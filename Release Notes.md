@@ -1,3 +1,7 @@
+### New in 1.0.0
+
+* .Net 4.5 & .Net Core 2.0 compatible
+
 ### New in 0.3.0
 
 * Fix printing escaped parts when text is accumulated. `colorprintfn "1 %d %d" 2 3` was generating `231` ([Issue #1](https://github.com/vbfox/ColoredPrintf/issues/1))

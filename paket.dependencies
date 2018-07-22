@@ -5,9 +5,8 @@ framework: netcoreapp2.0,netstandard1.6,netstandard2.0,net45
 storage:none
 
 nuget Expecto
-nuget FSharp.Core ~> 4
+nuget FSharp.Core ~> 4.0
 nuget FSharp.Data prerelease
-nuget BlackFox.MasterOfFoo ~> 1.0
 
 // Build infrastructure
 group build
@@ -15,7 +14,7 @@ group build
     storage: none
     framework: netcoreapp2.0
 
-    nuget FSharp.Core ~> 4
+    nuget FSharp.Core ~> 4.0
     nuget Fake.Core.Target
     nuget Fake.Core.Environment
     nuget Fake.Core.Process

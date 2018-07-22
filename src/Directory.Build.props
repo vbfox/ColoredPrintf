@@ -1,12 +1,20 @@
 <Project>
   <PropertyGroup>
-    <ArtifactsDir>$(MSBuildThisFileDirectory)/../artifacts/</ArtifactsDir>
+    <ArtifactsDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)/../artifacts/'))</ArtifactsDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(MSBuildProjectName)' != 'BlackFox.ColoredPrintf.Build'">
-    <OutputPath>$(ArtifactsDir)/$(MSBuildProjectName)/$(Configuration)/</OutputPath>
+    <OutputPath>$([System.IO.Path]::GetFullPath('$(ArtifactsDir)/$(MSBuildProjectName)/$(Configuration)/'))</OutputPath>
   </PropertyGroup>
   <PropertyGroup>
-    <Description>An F# library to allow using printf style strings in more places.</Description>
+    <Description>Provide a printf replacement with colors.
+
+  This library provide a colorprintf function where colors can be set for a range using the syntax :
+
+      $foreground;background[text]
+
+  For example:
+
+      colorprintf "Hello $red[%s]." "world"</Description>
     <PackageProjectUrl>https://github.com/vbfox/ColoredPrintf</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/vbfox/ColoredPrintf/blob/master/License.md</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/vbfox/ColoredPrintf.git</RepositoryUrl>
