@@ -1,0 +1,20 @@
+<Project>
+  <PropertyGroup>
+    <ArtifactsDir>$(MSBuildThisFileDirectory)/../artifacts/</ArtifactsDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' != 'BlackFox.ColoredPrintf.Build'">
+    <OutputPath>$(ArtifactsDir)/$(MSBuildProjectName)/$(Configuration)/</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Description>An F# library to allow using printf style strings in more places.</Description>
+    <PackageProjectUrl>https://github.com/vbfox/ColoredPrintf</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/vbfox/ColoredPrintf/blob/master/License.md</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/vbfox/ColoredPrintf.git</RepositoryUrl>
+    <PackageTags>F#;FSharp;printf;color</PackageTags>
+    <Authors>vbfox</Authors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(ArtifactsDir)/Version.fs"  Condition="exists('$(ArtifactsDir)/Version.fs')"/>
+  </ItemGroup>
+  <Import Project="$(ArtifactsDir)/Version.props" Condition="exists('$(ArtifactsDir)/Version.props')" />
+</Project>

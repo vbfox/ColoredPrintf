@@ -8,7 +8,6 @@ let issue1 =
 
     testList "Issue #1" [
         testCase "Incorrect  1" <| fun _ ->
-            Array.scanBack
             verifyprintf [ Write("1 2 3") ] "1 2 %d" 3
 
         testCase "Incorrect  2" <| fun _ ->
