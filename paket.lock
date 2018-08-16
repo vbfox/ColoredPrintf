@@ -488,6 +488,9 @@ STORAGE: NONE
 RESTRICTION: == netcoreapp2.0
 NUGET
   remote: https://api.nuget.org/v3/index.json
+    BlackFox.Fake.BuildTask (0.1)
+      Fake.Core.Target (>= 5.1)
+      FSharp.Core (>= 4.5.2)
     Fake.Api.GitHub (5.4.1)
       FSharp.Core (>= 4.3.4)
       Octokit (>= 0.31)

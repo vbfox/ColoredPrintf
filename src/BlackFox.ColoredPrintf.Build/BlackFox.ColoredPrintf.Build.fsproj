@@ -11,7 +11,6 @@
       <Link>paket-files/CommandLine.fs</Link>
     </Compile>
     <Compile Include="AppveyorEx.fs" />
-    <Compile Include="TypedTaskDefinitionHelper.fs" />
     <Compile Include="Tasks.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
