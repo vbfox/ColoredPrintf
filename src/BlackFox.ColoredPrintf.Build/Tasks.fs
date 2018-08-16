@@ -4,6 +4,7 @@ open Fake.Api
 open Fake.BuildServer
 open Fake.Core
 open Fake.DotNet
+open Fake.DotNet.Testing
 open Fake.IO
 open Fake.IO.Globbing
 open Fake.IO.Globbing.Operators
@@ -92,7 +93,7 @@ let createAndGetDefault () =
 
     let runTests = task "RunTests" [build] {
         [artifactsDir </> "BlackFox.ColoredPrintf.Tests" </> configuration </> "netcoreapp2.0" </> "BlackFox.ColoredPrintf.Tests.dll"]
-            |> ExpectoDotNetCli.run (fun p ->
+            |> Expecto.run (fun p ->
                 { p with
                     PrintVersion = false
                     FailOnFocusedTests = true

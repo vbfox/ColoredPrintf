@@ -10,7 +10,6 @@
       <Paket>True</Paket>
       <Link>paket-files/CommandLine.fs</Link>
     </Compile>
-    <Compile Include="ExpectoDotNetCli.fs" />
     <Compile Include="AppveyorEx.fs" />
     <Compile Include="TypedTaskDefinitionHelper.fs" />
     <Compile Include="Tasks.fs" />
