@@ -17,6 +17,7 @@ group build
     Fake.DotNet.MsBuild
     Fake.DotNet.Paket
     Fake.BuildServer.AppVeyor
+    Fake.BuildServer.Travis
     Fake.Api.GitHub
 
     File: CommandLine.fs

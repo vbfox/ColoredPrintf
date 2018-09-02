@@ -59,7 +59,7 @@ let createAndGetDefault () =
         else
             fromFile
 
-    AppVeyorEx.updateBuild (fun info -> { info with Version = Some release.AssemblyVersion })
+    Trace.setBuildNumber release.AssemblyVersion
 
     let writeVersionProps() =
         let doc =

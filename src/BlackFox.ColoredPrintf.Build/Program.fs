@@ -4,19 +4,10 @@ open BlackFox.Fake
 open Fake.Core
 open Fake.BuildServer
 
-let setupFakeContext (argv: string list) =
-    let argvTweaked =
-        match argv with
-        | [ singleArg ] when not (singleArg.StartsWith("-")) ->
-            [ "--target"; singleArg ]
-        | _ -> argv
-    let execContext = Context.FakeExecutionContext.Create false "build.fsx" argvTweaked
-    Context.setExecutionContext (Fake.Core.Context.RuntimeContext.Fake execContext)
-
 [<EntryPoint>]
 let main argv =
-    setupFakeContext (List.ofArray argv)
-    BuildServer.install [ AppVeyor.Installer ]
+    BuildTask.setupContextFromArgv argv
+    BuildServer.install [ AppVeyor.Installer; Travis.Installer ]
 
     let defaultTask = Tasks.createAndGetDefault ()
     BuildTask.runOrDefault defaultTask
