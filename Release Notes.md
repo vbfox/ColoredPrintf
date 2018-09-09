@@ -1,3 +1,7 @@
+## New in 1.0.2
+
+* Remove ValueTuple reference
+
 ### New in 1.0.1
 
 * Add an icon to the NuGet package
