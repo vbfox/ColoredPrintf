@@ -102,7 +102,7 @@ let createAndGetDefault () =
 
     let nupkgDir = artifactsDir </> "BlackFox.ColoredPrintf" </> configuration
 
-    let nuget = BuildTask.create "NuGet" [build] {
+    let nuget = BuildTask.create "NuGet" [build;runTests.IfNeeded] {
         DotNet.pack
             (fun p -> { p with Configuration = fakeConfiguration })
             libraryProjectFile
@@ -124,7 +124,7 @@ let createAndGetDefault () =
 
     let zipFile = artifactsDir </> (sprintf "BlackFox.ColoredPrintf-%s.zip" release.NugetVersion)
 
-    let zip = BuildTask.create "Zip" [build] {
+    let zip = BuildTask.create "Zip" [build;runTests.IfNeeded] {
         let comment = sprintf "ColoredPrintf v%s" release.NugetVersion
         from libraryBinDir
             ++ "**/*.dll"
@@ -135,7 +135,7 @@ let createAndGetDefault () =
         Trace.publish ImportData.BuildArtifact zipFile
     }
 
-    let gitRelease = BuildTask.create "GitRelease" [nuget.IfNeeded] {
+    let gitRelease = BuildTask.create "GitRelease" [nuget.IfNeeded;runTests.IfNeeded] {
         let remote =
             Git.CommandHelper.getGitResult "" "remote -v"
             |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
@@ -170,7 +170,7 @@ let createAndGetDefault () =
         |> Async.RunSynchronously
     }
 
-    let _releaseTask = BuildTask.createEmpty "Release" [clean; gitRelease; githubRelease; publishNuget]
+    let _releaseTask = BuildTask.createEmpty "Release" [clean; runTests; gitRelease; githubRelease; publishNuget]
     let _ciTask = BuildTask.createEmpty "CI" [clean; runTests; zip; nuget]
 
     BuildTask.createEmpty "Default" [runTests]
