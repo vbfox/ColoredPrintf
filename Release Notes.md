@@ -1,3 +1,7 @@
+### New in 1.0.1
+
+* Add an icon to the NuGet package
+
 ### New in 1.0.0
 
 * .Net 4.5 & .Net Core 2.0 compatible

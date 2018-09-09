@@ -1,5 +1,4 @@
-﻿Colored Printf
-==============
+﻿# Colored Printf
 
 [![Join the chat at https://gitter.im/vbfox/ColoredPrintf](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/vbfox/ColoredPrintf?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/19hodvli3yq1andd/branch/master?svg=true)](https://ci.appveyor.com/project/vbfox/coloredprintf/branch/master)
@@ -10,8 +9,7 @@ This library provide a replacement to F# `printf` function with color support.
 
 The syntax to set the color inside the string is `$foreground;background[text]` where both foreground and background are optional.
 
-Examples
---------
+## Examples
 
 ```fsharp
 colorprintfn "Hello $red[world]."
@@ -23,3 +21,7 @@ colorprintfn "$white;blue[%s ]$black;white[%s ]$white;red[%s]" "La vie" "est" "b
 Displays :
 
 ![Demo](doc/demo.png)
+
+## Thanks
+
+* [Newaita icon pack](https://github.com/cbrnix/Newaita) for the base of the icon (License: [CC BY-NC-SA 3.0]
