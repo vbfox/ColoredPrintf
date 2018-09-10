@@ -6,10 +6,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="paket.references" />
-    <Compile Include="..\..\paket-files\build\vbfox\FoxSharp\src\BlackFox.FoxSharp\CommandLine.fs">
-      <Paket>True</Paket>
-      <Link>paket-files/CommandLine.fs</Link>
-    </Compile>
     <Compile Include="Tasks.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

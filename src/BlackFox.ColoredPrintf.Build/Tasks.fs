@@ -92,12 +92,14 @@ let createAndGetDefault () =
     }
 
     let runTests = BuildTask.create "RunTests" [build] {
-        [artifactsDir </> "BlackFox.ColoredPrintf.Tests" </> configuration </> "netcoreapp2.0" </> "BlackFox.ColoredPrintf.Tests.dll"]
+        let testsBinaryDir = artifactsDir </> "BlackFox.ColoredPrintf.Tests" </> configuration </> "netcoreapp2.0"
+        [testsBinaryDir </> "BlackFox.ColoredPrintf.Tests.dll"]
             |> Expecto.run (fun p ->
                 { p with
                     PrintVersion = false
                     FailOnFocusedTests = true
                 })
+        Trace.publish (ImportData.Nunit NunitDataVersion.Nunit) (testsBinaryDir </> "TestResults.xml")
     }
 
     let nupkgDir = artifactsDir </> "BlackFox.ColoredPrintf" </> configuration
