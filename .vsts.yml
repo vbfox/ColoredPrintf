@@ -1,9 +1,0 @@
-pool:
-  vmImage: 'Hosted VS2017'
-steps:
-  - script: dotnet help
-    displayName: .NET first run experience
-  - script: ./paket.exe restore
-    displayName: Restore packages
-  - script: ./build.cmd
-    displayName: Build

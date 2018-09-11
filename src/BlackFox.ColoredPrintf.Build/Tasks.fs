@@ -45,21 +45,19 @@ let createAndGetDefault () =
     /// The name of the project on GitHub
     let gitName = "ColoredPrintf"
 
-    /// The url for the raw files hosted
-    let gitRaw = Environment.environVarOrDefault "gitRaw" ("https://raw.github.com/" + gitOwner)
+    let getUnionCaseName (x:'a) =
+        match Microsoft.FSharp.Reflection.FSharpValue.GetUnionFields(x, typeof<'a>) with | case, _ -> case.Name
 
     let release =
         let fromFile = ReleaseNotes.load (rootDir </> "Release Notes.md")
-        if BuildServer.buildServer = BuildServer.AppVeyor then
-            let appVeyorBuildVersion = int AppVeyor.Environment.BuildVersion
-            let nugetVer = sprintf "%s-appveyor%04i" fromFile.NugetVersion appVeyorBuildVersion
-            let asmVer = System.Version.Parse(fromFile.AssemblyVersion)
-            let asmVer = System.Version(asmVer.Major, asmVer.Minor, asmVer.Build, appVeyorBuildVersion)
-            ReleaseNotes.ReleaseNotes.New(asmVer.ToString(), nugetVer, fromFile.Date, fromFile.Notes)
+        if BuildServer.buildServer <> BuildServer.LocalBuild then
+            let buildServerName = (getUnionCaseName BuildServer.buildServer).ToLowerInvariant()
+            let nugetVer = sprintf "%s-%s.%s" fromFile.NugetVersion buildServerName BuildServer.buildVersion
+            ReleaseNotes.ReleaseNotes.New(fromFile.AssemblyVersion, nugetVer, fromFile.Date, fromFile.Notes)
         else
             fromFile
 
-    Trace.setBuildNumber release.AssemblyVersion
+    Trace.setBuildNumber release.NugetVersion
 
     let writeVersionProps() =
         let doc =

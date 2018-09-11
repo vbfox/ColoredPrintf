@@ -1,0 +1,25 @@
+jobs:
+- job: Linux
+  pool:
+    vmImage: 'ubuntu-16.04'
+  steps:
+  - script: dotnet help
+    displayName: .NET first run experience
+  - script: ./paket.sh restore
+    displayName: Restore packages
+  - script: dotnet build src/BlackFox.ColoredPrintf.Build/BlackFox.ColoredPrintf.Build.fsproj
+    displayName: Compile build script
+  - script: ./build.sh CI
+    displayName: Build
+- job: Windows
+  pool:
+    vmImage: 'vs2017-win2016'
+  steps:
+  - script: dotnet help
+    displayName: .NET first run experience
+  - script: paket.exe restore
+    displayName: Restore packages
+  - script: dotnet build src/BlackFox.ColoredPrintf.Build/BlackFox.ColoredPrintf.Build.fsproj
+    displayName: Compile build script
+  - script: build.cmd CI
+    displayName: Build

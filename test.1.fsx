@@ -1,2 +1,0 @@
-printfn "Hello"
-printfn "world"
