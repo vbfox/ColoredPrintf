@@ -2,6 +2,4 @@
 
 ./paket.sh restore || { exit $?; }
 
-pushd src/BlackFox.ColoredPrintf.Build/
-dotnet run $@
-popd
+dotnet run --project src/BlackFox.ColoredPrintf.Build/BlackFox.ColoredPrintf.Build.fsproj -- $@
