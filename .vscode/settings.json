@@ -16,5 +16,6 @@
         "**/packages": true,
         "**/paket-files": true,
         "**/artifacts": true
-    }
+    },
+    "FSharp.workspacePath": "./BlackFox.ColoredPrintf.sln"
 }
