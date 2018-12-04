@@ -21,6 +21,10 @@
     <PackageTags>F#;FSharp;printf;color</PackageTags>
     <Authors>vbfox</Authors>
   </PropertyGroup>
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>FS2003</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(ArtifactsDir)/Version.fs"  Condition="exists('$(ArtifactsDir)/Version.fs')"/>
   </ItemGroup>

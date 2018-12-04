@@ -1,3 +1,8 @@
+## New in 1.0.3
+
+* Include pdb files in package (With SourceLink)
+* Include XmlDoc in package
+
 ## New in 1.0.2
 
 * Remove ValueTuple reference
