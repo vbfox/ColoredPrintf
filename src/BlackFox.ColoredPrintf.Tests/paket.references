@@ -1,4 +1,6 @@
-﻿FSharp.Core
+﻿Microsoft.NET.Test.Sdk
+FSharp.Core
 Expecto
 Expecto.TestResults
+YoloDev.Expecto.TestSdk
 FSharp.Data
