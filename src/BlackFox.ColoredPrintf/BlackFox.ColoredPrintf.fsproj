@@ -16,7 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="[4.0.0.1,5.0.0)" Condition="'$(TargetFramework)' == 'net45'" />
-    <PackageReference Include="FSharp.Core" Version="[4.2.3,5.0.0)" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+    <PackageReference Include="FSharp.Core" Version="[4.2.3,6.0.0)" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="BlackFox.MasterOfFoo" Version="[1.0.2,2.0.0)" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All"/>
   </ItemGroup>
