@@ -1,3 +1,10 @@
+### New in 1.0.4
+
+* Make dependency ranges less strict (For `FSharp.Core` 6.x)
+* Build with 5.0.201 SDK
+* Specify the package license using SPDX
+* Embed the package icon
+
 ## New in 1.0.3
 
 * Include pdb files in package (With SourceLink)
