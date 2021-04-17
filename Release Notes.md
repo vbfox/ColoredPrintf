@@ -1,3 +1,7 @@
+### New in 1.0.5
+
+* Bump MasterOfFoo minimal version so that NuGet algorithm of resolving lowest version is happy
+
 ### New in 1.0.4
 
 * Make dependency ranges less strict (For `FSharp.Core` 6.x)
