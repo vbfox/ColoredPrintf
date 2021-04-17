@@ -15,6 +15,8 @@ open BlackFox
 open BlackFox.Fake
 open System.Xml.Linq
 
+let testProjectName = "BlackFox.ColoredPrintf.Tests"
+
 let createAndGetDefault () =
     let configuration = Environment.environVarOrDefault "configuration" "Release"
     let fakeConfiguration =
@@ -59,6 +61,8 @@ let createAndGetDefault () =
 
     Trace.setBuildNumber release.NugetVersion
 
+    let nupkgFile = libraryBinDir </> (sprintf "BlackFox.ColoredPrintf.%s.nupkg" release.NugetVersion)
+
     let writeVersionProps() =
         let doc =
             XDocument(
@@ -90,25 +94,29 @@ let createAndGetDefault () =
     }
 
     let runTests = BuildTask.create "RunTests" [build] {
-        let testsBinaryDir = artifactsDir </> "BlackFox.ColoredPrintf.Tests" </> configuration </> "netcoreapp2.0"
-        [testsBinaryDir </> "BlackFox.ColoredPrintf.Tests.dll"]
-            |> Expecto.run (fun p ->
-                { p with
-                    PrintVersion = false
-                    FailOnFocusedTests = true
-                })
-        Trace.publish (ImportData.Nunit NunitDataVersion.Nunit) (testsBinaryDir </> "TestResults.xml")
-    }
+        let baseTestDir = artifactsDir </> testProjectName </> (string configuration)
+        let testConfs = ["netcoreapp2.0", ".dll"; "net5.0", ".dll"]
 
-    let nupkgDir = artifactsDir </> "BlackFox.ColoredPrintf" </> configuration
+        testConfs
+        |> List.map (fun (fw, ext) -> baseTestDir </> fw </> (testProjectName + ext))
+        |> Expecto.run (fun p ->
+            { p with
+                PrintVersion = false
+                FailOnFocusedTests = true
+            })
+
+        for (fw, _) in testConfs do
+            let dir = baseTestDir </> fw
+            let outFile = sprintf "TestResults_%s.xml" (fw.Replace('.', '_'))
+            File.delete (dir </> outFile)
+            (dir </> "TestResults.xml") |> Shell.rename (dir </> outFile)
+            Trace.publish (ImportData.Nunit NunitDataVersion.Nunit) (dir </> outFile)
+    }
 
     let nuget = BuildTask.create "NuGet" [build;runTests.IfNeeded] {
         DotNet.pack
             (fun p -> { p with Configuration = fakeConfiguration })
             libraryProjectFile
-        let nupkgFile =
-            nupkgDir
-                </> (sprintf "BlackFox.ColoredPrintf.%s.nupkg" release.NugetVersion)
 
         Trace.publish ImportData.BuildArtifact nupkgFile
     }
@@ -119,7 +127,9 @@ let createAndGetDefault () =
             | Some(key) -> key
             | None -> UserInput.getUserPassword "NuGet key: "
 
-        Paket.push <| fun p ->  { p with WorkingDir = nupkgDir; ApiKey = key }
+        Paket.pushFiles
+            (fun o -> { o with ApiKey = key; WorkingDir = rootDir })
+            [nupkgFile]
     }
 
     let zipFile = artifactsDir </> (sprintf "BlackFox.ColoredPrintf-%s.zip" release.NugetVersion)
