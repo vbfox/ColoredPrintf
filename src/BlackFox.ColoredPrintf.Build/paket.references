@@ -16,7 +16,5 @@ group build
     Fake.DotNet.Testing.Expecto
     Fake.DotNet.MsBuild
     Fake.DotNet.Paket
-    Fake.BuildServer.AppVeyor
-    Fake.BuildServer.Travis
-    Fake.BuildServer.TeamFoundation
+    Fake.BuildServer.GitHubActions
     Fake.Api.GitHub

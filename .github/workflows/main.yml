@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+      PAKET_SKIP_RESTORE_TARGETS: true
+    steps:
+    - uses: actions/checkout@v2
+    - name: Restore packages
+      run: ./paket.sh restore
+    - name: Compile build script
+      run: dotnet build src/BlackFox.MasterOfFoo.Build/BlackFox.MasterOfFoo.Build.fsproj
+    - name: Build
+      run: ./build.sh CI
+  windows:
+    runs-on: windows-latest
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+      PAKET_SKIP_RESTORE_TARGETS: true
+    steps:
+    - uses: actions/checkout@v2
+    - name: Restore packages
+      run: ./paket.cmd restore
+    - name: Compile build script
+      run: dotnet build src/BlackFox.MasterOfFoo.Build/BlackFox.MasterOfFoo.Build.fsproj
+    - name: Build
+      run: ./build.cmd CI
