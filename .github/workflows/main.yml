@@ -19,7 +19,7 @@ jobs:
     - name: Restore packages
       run: ./paket.sh restore
     - name: Compile build script
-      run: dotnet build src/BlackFox.MasterOfFoo.Build/BlackFox.MasterOfFoo.Build.fsproj
+      run: dotnet build src/BlackFox.ColoredPrintf.Build/BlackFox.ColoredPrintf.Build.fsproj
     - name: Build
       run: ./build.sh CI
   windows:
@@ -34,6 +34,6 @@ jobs:
     - name: Restore packages
       run: ./paket.cmd restore
     - name: Compile build script
-      run: dotnet build src/BlackFox.MasterOfFoo.Build/BlackFox.MasterOfFoo.Build.fsproj
+      run: dotnet build src/BlackFox.ColoredPrintf.Build/BlackFox.ColoredPrintf.Build.fsproj
     - name: Build
       run: ./build.cmd CI
