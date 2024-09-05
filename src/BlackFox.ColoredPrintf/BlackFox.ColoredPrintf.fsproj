@@ -22,7 +22,7 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.5.0" Condition="'$(TargetFramework)' == 'net461'" />
     <PackageReference Include="FSharp.Core" Version="4.5.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
-    <PackageReference Include="BlackFox.MasterOfFoo" Version="2.0.0-alpha.2" />
+    <PackageReference Include="BlackFox.MasterOfFoo" Version="[2.0.0,3.0.0)" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
   </ItemGroup>
 </Project>
