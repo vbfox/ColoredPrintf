@@ -1,3 +1,7 @@
+### New in 2.0.0-alpha.1
+
+* Depend on MasterOfFoo 2.0 for interpolated strings support
+
 ### New in 1.0.5
 
 * Bump MasterOfFoo minimal version so that NuGet algorithm of resolving lowest version is happy
