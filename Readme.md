@@ -35,7 +35,7 @@ colorprintfn $"result: ${logColor}[Hello world]"
 
 Displays :
 
-![Demo](doc/demo.png)
+![Demo](https://raw.githubusercontent.com/vbfox/ColoredPrintf/master/doc/demo.png)
 
 ## Thanks
 
