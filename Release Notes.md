@@ -1,4 +1,4 @@
-### New in 2.0.0-alpha.1
+### New in 2.0.0
 
 * Depend on MasterOfFoo 2.0 for interpolated strings support
 
