@@ -7,15 +7,30 @@
 
 This library provide a replacement to F# `printf` function with color support.
 
-The syntax to set the color inside the string is `$foreground;background[text]` where both foreground and background are optional.
+The syntax to set the color inside the string is `$foreground;background[text]` where both foreground and background
+are optional.
+
+The supported colors are the one from the [System.ConsoleColor](https://docs.microsoft.com/en-us/dotnet/api/system.consolecolor) enum.
 
 ## Examples
 
 ```fsharp
-colorprintfn "Hello $red[world]."
-colorprintfn "Hello $green[%s]." "user"
+// Change the color of part of a string
+colorprintfn "$red[Hello] $white;red[world]."
+
+// Use sprintf syntax
+colorprintfn "Hello $green[%s]: %s" "user" "Welcome to color!"
 colorprintfn "$white[Progress]: $yellow[%.2f%%] (Eta $yellow[%i] minutes)" 42.33 5
-colorprintfn "$white;blue[%s ]$black;white[%s ]$white;red[%s]" "La vie" "est" "belle"
+
+// Use interpolated strings
+let life = "La vie"
+let is_ = "est"
+colorprintfn $"""$white;blue[%s{life} ]$black;white[{is_} ]$white;red[{"belle"}]"""
+
+// Specify the colors from variables
+let logColor = ConsoleColor.Yellow
+colorprintfn "result: $%A[Hello world]" logColor
+colorprintfn $"result: ${logColor}[Hello world]"
 ```
 
 Displays :
