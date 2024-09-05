@@ -3,7 +3,7 @@ framework: net8.0,net5.0,netcoreapp2.0,netstandard2.0,net461
 storage:none
 
 nuget Expecto ~> 9
-nuget FSharp.Core ~> 4.0
+nuget FSharp.Core
 nuget FSharp.Data prerelease
 
 // Build infrastructure
@@ -12,7 +12,7 @@ group build
     storage: none
     framework: net8.0
 
-    nuget FSharp.Core ~> 4.0
+    nuget FSharp.Core ~> 5
     nuget BlackFox.Fake.BuildTask
 
     nuget Octokit 0.48 // Fake.Api.GitHub 5.20.4 references 0.48+ but 0.50 has some incompatible Api changes
