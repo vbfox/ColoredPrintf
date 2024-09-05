@@ -23,7 +23,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn>FS2003</NoWarn>
+    <NoWarn>$(NoWarn);FS2003;NU1902;NU1903;NU1904;NETSDK1138</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(ArtifactsDir)/Version.fs"  Condition="exists('$(ArtifactsDir)/Version.fs')"/>

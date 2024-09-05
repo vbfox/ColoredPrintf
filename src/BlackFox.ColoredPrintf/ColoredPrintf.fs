@@ -33,6 +33,25 @@ type private ConsoleColoredPrinterEnv() =
                 bg <- c
                 wrap(fun _ -> Console.BackgroundColor <- c)
 
+let consoleColorType = typeof<ConsoleColor>
+
+/// Extracts a ConsoleColor instance from the element
+///
+/// Handle both sprintf style format where the type is available in ValueType and .NET style format where it isn't
+let extractConsoleColor (s : PrintableElement) =
+    if consoleColorType.Equals(s.ValueType) then
+        // sprintf style: $"%A{ConsoleColor.Red}"
+        Some (s.Value :?> ConsoleColor)
+    else
+        match s.Specifier with
+        | Some specifier when specifier.TypeChar = 'P' ->
+            if not (obj.ReferenceEquals(s.Value, null)) && consoleColorType.Equals(s.Value.GetType()) then
+                // .NET style: $"{ConsoleColor.Red}"
+                Some (s.Value :?> ConsoleColor)
+            else
+                None
+        | _ -> None
+
 type internal ColoredConsolePrintEnv<'Result>(env: IColoredPrinterEnv, k) =
     inherit PrintfEnv<unit, string, 'Result>()
 
@@ -45,10 +64,10 @@ type internal ColoredConsolePrintEnv<'Result>(env: IColoredPrinterEnv, k) =
     override __.Write(s : PrintableElement) =
         match s.ElementType with
         | PrintableElementType.FromFormatSpecifier ->
-            if typeof<ConsoleColor>.Equals(s.ValueType) && canAcceptColor(state) then
-                state |> writeColor (s.Value :?> ConsoleColor)
-            else
-                state |> writeEscapedString (s.FormatAsPrintF())
+            let consoleColor = if canAcceptColor(state) then extractConsoleColor s else None
+            match consoleColor with
+            | Some color -> state |> writeColor color
+            | None -> state |> writeEscapedString (s.FormatAsPrintF())
         | _ ->
             state |> writeString env (s.FormatAsPrintF())
 

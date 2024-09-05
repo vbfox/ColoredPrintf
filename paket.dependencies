@@ -1,18 +1,18 @@
 source https://api.nuget.org/v3/index.json
-framework: net5.0,netcoreapp2.0,netstandard1.6,netstandard2.0,net45
+framework: net8.0,net5.0,netcoreapp2.0,netstandard2.0,net461
 storage:none
 
-nuget Expecto
-nuget FSharp.Core ~> 4.0
+nuget Expecto ~> 9
+nuget FSharp.Core
 nuget FSharp.Data prerelease
 
 // Build infrastructure
 group build
     source https://api.nuget.org/v3/index.json
     storage: none
-    framework: net5.0
+    framework: net8.0
 
-    nuget FSharp.Core ~> 4.0
+    nuget FSharp.Core ~> 5
     nuget BlackFox.Fake.BuildTask
 
     nuget Octokit 0.48 // Fake.Api.GitHub 5.20.4 references 0.48+ but 0.50 has some incompatible Api changes

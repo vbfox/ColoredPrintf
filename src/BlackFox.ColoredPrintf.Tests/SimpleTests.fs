@@ -126,7 +126,15 @@ let simpleTests =
                 [
                     Write("Hello world")
                 ]
-                "Hello world"
+                "Hello %s"
+                "world"
+
+        testCase "Simple interpolated printf" <| fun _ ->
+            verifyprintf
+                [
+                    Write("Hello world")
+                ]
+                $"""Hello %s{"world"}"""
 
         testCase "color printf" <| fun _ ->
             verifyprintf
@@ -136,5 +144,96 @@ let simpleTests =
                     Write("world")
                     SetForeground(ConsoleColor.White)
                 ]
-                "Hello $red[world]"
+                "Hello $red[%s]"
+                "world"
+
+        testCase "color printf (FG via %A)" <| fun _ ->
+            verifyprintf
+                [
+                    Write("Hello ")
+                    SetForeground(ConsoleColor.DarkBlue)
+                    Write("world")
+                    SetForeground(ConsoleColor.White)
+                ]
+                "Hello $%A[%s]"
+                ConsoleColor.DarkBlue
+                "world"
+
+        testCase "color printf (BG via %A)" <| fun _ ->
+            verifyprintf
+                [
+                    Write("Hello ")
+                    SetForeground(ConsoleColor.Red)
+                    SetBackground(ConsoleColor.DarkBlue)
+                    Write("world")
+                    SetForeground(ConsoleColor.White)
+                    SetBackground(ConsoleColor.Black)
+                ]
+                "Hello $red;%A[%s]"
+                ConsoleColor.DarkBlue
+                "world"
+
+        testCase "color interpolated printf" <| fun _ ->
+            verifyprintf
+                [
+                    Write("Hello ")
+                    SetForeground(ConsoleColor.Red)
+                    Write("world")
+                    SetForeground(ConsoleColor.White)
+                ]
+                $"""Hello $red[%s{"world"}]"""
+
+        testCase "color interpolated printf .NET" <| fun _ ->
+            verifyprintf
+                [
+                    Write("Hello ")
+                    SetForeground(ConsoleColor.Red)
+                    Write("world")
+                    SetForeground(ConsoleColor.White)
+                ]
+                $"""Hello $red[{"world"}]"""
+
+        testCase "color interpolated printf (FG via %A)" <| fun _ ->
+            verifyprintf
+                [
+                    Write("Hello ")
+                    SetForeground(ConsoleColor.DarkBlue)
+                    Write("world")
+                    SetForeground(ConsoleColor.White)
+                ]
+                $"""Hello $%A{ConsoleColor.DarkBlue}[%s{"world"}]"""
+
+        testCase "color interpolated printf (BG via %A)" <| fun _ ->
+            verifyprintf
+                [
+                    Write("Hello ")
+                    SetForeground(ConsoleColor.Red)
+                    SetBackground(ConsoleColor.DarkBlue)
+                    Write("world")
+                    SetForeground(ConsoleColor.White)
+                    SetBackground(ConsoleColor.Black)
+                ]
+                $"""Hello $red;%A{ConsoleColor.DarkBlue}[%s{"world"}]"""
+
+        testCase "color interpolated printf (FG via .NET hole)" <| fun _ ->
+            verifyprintf
+                [
+                    Write("Hello ")
+                    SetForeground(ConsoleColor.DarkBlue)
+                    Write("world")
+                    SetForeground(ConsoleColor.White)
+                ]
+                $"""Hello ${ConsoleColor.DarkBlue}[%s{"world"}]"""
+
+        testCase "color interpolated printf (BG via .NET hole)" <| fun _ ->
+            verifyprintf
+                [
+                    Write("Hello ")
+                    SetForeground(ConsoleColor.Red)
+                    SetBackground(ConsoleColor.DarkBlue)
+                    Write("world")
+                    SetForeground(ConsoleColor.White)
+                    SetBackground(ConsoleColor.Black)
+                ]
+                $"""Hello $red;{ConsoleColor.DarkBlue}[%s{"world"}]"""
     ]

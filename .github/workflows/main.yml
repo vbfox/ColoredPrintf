@@ -15,7 +15,12 @@ jobs:
       DOTNET_NOLOGO: 1
       PAKET_SKIP_RESTORE_TARGETS: true
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          2
+          5
     - name: Restore packages
       run: ./paket.sh restore
     - name: Compile build script
@@ -30,7 +35,12 @@ jobs:
       DOTNET_NOLOGO: 1
       PAKET_SKIP_RESTORE_TARGETS: true
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          2
+          5
     - name: Restore packages
       run: ./paket.cmd restore
     - name: Compile build script
