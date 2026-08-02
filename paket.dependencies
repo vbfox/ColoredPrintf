@@ -2,7 +2,7 @@ source https://api.nuget.org/v3/index.json
 framework: net10.0,netcoreapp2.0,netstandard2.0,net461
 storage:none
 
-nuget Expecto ~> 9
+nuget Expecto ~> 11
 nuget FSharp.Core
 nuget FSharp.Data prerelease
 
@@ -12,10 +12,10 @@ group build
     storage: none
     framework: net10.0
 
-    nuget FSharp.Core ~> 5
+    nuget FSharp.Core
     nuget BlackFox.Fake.BuildTask
 
-    nuget Octokit 0.48 // Fake.Api.GitHub 5.20.4 references 0.48+ but 0.50 has some incompatible Api changes
+    nuget Octokit
     nuget Fake.Core.Target
     nuget Fake.Core.Environment
     nuget Fake.Core.Process
