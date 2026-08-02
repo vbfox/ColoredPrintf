@@ -11,7 +11,7 @@ open Fake.IO.Globbing.Operators
 open Fake.IO.FileSystemOperators
 open Fake.Tools
 
-open BlackFox
+open BlackFox.CommandLine
 open BlackFox.Fake
 open System.Xml.Linq
 
@@ -60,9 +60,14 @@ let createAndGetDefault () =
     let getUnionCaseName (x:'a) =
         match Microsoft.FSharp.Reflection.FSharpValue.GetUnionFields(x, typeof<'a>) with | case, _ -> case.Name
 
+    // A release tag build (the "Publish" workflow, triggered by a version tag push) must use the
+    // plain version from Release Notes.md, not a CI-suffixed prerelease version, since it has to
+    // match the pushed tag and be the version actually published.
+    let isReleaseTagBuild = Environment.environVarOrNone "GITHUB_REF_TYPE" = Some "tag"
+
     let release =
         let fromFile = ReleaseNotes.load (rootDir </> "Release Notes.md")
-        if BuildServer.buildServer <> BuildServer.LocalBuild then
+        if BuildServer.buildServer <> BuildServer.LocalBuild && not isReleaseTagBuild then
             let buildServerName = (getUnionCaseName BuildServer.buildServer).ToLowerInvariant()
             let nugetVer = sprintf "%s-%s.%s" fromFile.NugetVersion buildServerName BuildServer.buildVersion
             ReleaseNotes.ReleaseNotes.New(fromFile.AssemblyVersion, nugetVer, fromFile.Date, fromFile.Notes)
@@ -138,15 +143,26 @@ let createAndGetDefault () =
         Trace.publish ImportData.BuildArtifact nupkgFile
     }
 
-    let publishNuget = BuildTask.create "PublishNuget" [nuget] {
+    let ciPublishNuget = BuildTask.create "CIPublishNuget" [nuget] {
         let key =
             match Environment.environVarOrNone "nuget-key" with
-            | Some(key) -> key
+            | Some key -> key
             | None -> UserInput.getUserPassword "NuGet key: "
 
-        Paket.pushFiles
-            (fun o -> { o with ApiKey = key; WorkingDir = rootDir })
-            [nupkgFile]
+        let cmd =
+            CmdLine.empty
+            |> CmdLine.append "push"
+            |> CmdLine.append nupkgFile
+            |> CmdLine.append "--api-key"
+            |> CmdLine.append key
+            |> CmdLine.append "--source"
+            |> CmdLine.append "https://api.nuget.org/v3/index.json"
+            |> CmdLine.toString
+
+        let result = DotNet.exec id "nuget" cmd
+
+        if not result.OK then
+            failwithf "dotnet nuget push failed:\n%s" (String.concat "\n" result.Errors)
     }
 
     let zipFile = artifactsDir </> (sprintf "BlackFox.ColoredPrintf-%s.zip" release.NugetVersion)
@@ -162,42 +178,87 @@ let createAndGetDefault () =
         Trace.publish ImportData.BuildArtifact zipFile
     }
 
-    let gitRelease = BuildTask.create "GitRelease" [nuget.IfNeeded;runTests.IfNeeded] {
+    /// Validate that it's safe to cut a release, then tag and push. Pushing the tag is what triggers
+    /// the "Publish" GitHub Actions workflow, which does the actual build/test/pack/publish.
+    let tagRelease = BuildTask.create "TagRelease" [init] {
+        Git.CommandHelper.directRunGitCommandAndFail "" "fetch origin main --tags"
+
+        if Git.Information.getBranchName "" <> "main" then
+            failwith "Releases must be created from the 'main' branch."
+
+        let localSha = Git.Branches.getSHA1 "" "HEAD"
+        let remoteSha = Git.Branches.getSHA1 "" "origin/main"
+        if localSha <> remoteSha then
+            failwithf "Local 'main' (%s) is not in sync with 'origin/main' (%s). Pull or push before releasing." localSha remoteSha
+
+        if not (Git.Information.isCleanWorkingCopy "") then
+            failwith "Working copy has uncommitted changes."
+
+        let tagExistsLocally =
+            Git.CommandHelper.getGitResult "" "tag --list"
+            |> Seq.contains release.NugetVersion
+
+        let tagExistsOnRemote =
+            Git.CommandHelper.getGitResult "" "ls-remote --tags origin"
+            |> Seq.exists (fun (line: string) -> line.EndsWith("refs/tags/" + release.NugetVersion))
+
+        if tagExistsLocally || tagExistsOnRemote then
+            failwithf "Tag %s already exists, nothing to release." release.NugetVersion
+
         let remote =
             Git.CommandHelper.getGitResult "" "remote -v"
             |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
             |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
             |> function None -> gitHome + "/" + gitName | Some (s: string) -> s.Split().[0]
 
+        Trace.log (sprintf "About to release %s to %s:" release.NugetVersion remote)
+        Trace.log (String.toLines release.Notes)
+
+        let answer = UserInput.getUserInput (sprintf "Push tag %s? This triggers the publish workflow. [y/N] " release.NugetVersion)
+        if answer.Trim().ToLowerInvariant() <> "y" then
+            failwith "Aborted."
+
         Git.Branches.tag "" release.NugetVersion
         Git.Branches.pushTag "" remote release.NugetVersion
     }
 
-    let githubRelease = BuildTask.create "GitHubRelease" [zip;gitRelease.IfNeeded] {
-        let user =
-            match Environment.environVarOrNone "github-user" with
-            | Some s -> s
-            | _ -> UserInput.getUserInput "GitHub Username: "
-        let pw =
-            match Environment.environVarOrNone "github-pw" with
-            | Some s -> s
-            | _ -> UserInput.getUserPassword "GitHub Password or Token: "
+    let ciPublishGitHubRelease = BuildTask.create "CIPublishGitHubRelease" [zip] {
+        let client =
+            match Environment.environVarOrNone "GITHUB_TOKEN" with
+            | Some token -> GitHub.createClientWithToken token
+            | None ->
+                // This path is never called by CI but kept just in case
+                let user =
+                    match Environment.environVarOrNone "github-user" with
+                    | Some s -> s
+                    | _ -> UserInput.getUserInput "GitHub Username: "
+                let pw =
+                    match Environment.environVarOrNone "github-pw" with
+                    | Some s -> s
+                    | _ -> UserInput.getUserPassword "GitHub Password or Token: "
+                GitHub.createClient user pw
 
         // release on github
-        GitHub.createClient user pw
-        |> GitHub.createRelease gitOwner gitName release.NugetVersion (fun p ->
-            { p with
-                Prerelease = release.SemVer.PreRelease <> None
-                Body = String.toLines release.Notes
-                Draft = true
-            }
-        )
+        client
+        |> GitHub.draftNewRelease
+            gitOwner
+            gitName
+            release.NugetVersion
+            (release.SemVer.PreRelease <> None)
+            release.Notes
         |> GitHub.uploadFile zipFile
         |> GitHub.publishDraft
         |> Async.RunSynchronously
     }
 
-    let _releaseTask = BuildTask.createEmpty "Release" [clean; runTests; gitRelease; githubRelease; publishNuget]
+    /// Run locally to cut a release: validates preconditions then tags and pushes, which triggers
+    /// the `Publish` GitHub Actions workflow (see .github/workflows/publish.yml).
+    let _releaseTask = BuildTask.createEmpty "Release" [tagRelease]
+
+    /// Invoked by the `Publish` GitHub Actions workflow after a release tag is pushed: builds,
+    /// tests, packs, creates the GitHub Release and publishes the NuGet package.
+    let _ciPublishReleaseTask = BuildTask.createEmpty "CIPublishRelease" [clean; runTests; zip; nuget; ciPublishGitHubRelease; ciPublishNuget]
+
     let _ciTask = BuildTask.createEmpty "CI" [clean; runTests; zip; nuget]
 
     BuildTask.createEmpty "Default" [runTests]

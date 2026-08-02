@@ -1,6 +1,7 @@
 group build
     FSharp.Core
     BlackFox.Fake.BuildTask
+    BlackFox.CommandLine
 
     Fake.Core.Environment
     Fake.Core.Process
