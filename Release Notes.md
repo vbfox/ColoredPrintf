@@ -1,3 +1,7 @@
+### New in 2.0.1
+
+* Bump MasterOfFoo minimal version to 2.1.2
+
 ### New in 2.0.0
 
 * Depend on MasterOfFoo 2.0 for interpolated strings support
