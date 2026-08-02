@@ -1,4 +1,4 @@
-﻿module BlackFox.ColoredPrintf.ColorStrings
+﻿module internal BlackFox.ColoredPrintf.ColorStrings
 
 open System
 

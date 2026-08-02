@@ -1,4 +1,4 @@
-﻿module BlackFox.ColoredPrintf.ColoredWriter
+﻿module internal BlackFox.ColoredPrintf.ColoredWriter
 
 open System
 open System.Text
