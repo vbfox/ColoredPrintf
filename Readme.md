@@ -37,6 +37,16 @@ Displays :
 
 ![Demo](https://raw.githubusercontent.com/vbfox/ColoredPrintf/master/doc/demo.png)
 
+## Color support detection
+
+Colors are automatically disabled when standard output is redirected (e.g. piped to a file)
+or when `TERM=dumb`, and honor the [`NO_COLOR`](https://no-color.org) and
+[`FORCE_COLOR`](https://force-color.org) environment variable conventions:
+
+* If `FORCE_COLOR` is set to a non-empty value, colors are forced on, regardless of any other
+  condition (including `NO_COLOR` and redirection).
+* Otherwise, if `NO_COLOR` is set to a non-empty value, colors are disabled.
+
 ## Thanks
 
 * [Newaita icon pack](https://github.com/cbrnix/Newaita) for the base of the icon (License: [CC BY-NC-SA 3.0]

@@ -1,3 +1,8 @@
+### New in 2.1.0
+
+* Detect if the console supports colors (redirected output, `TERM=dumb`) and disable coloring proactively instead of only reacting to exceptions ([Issue #2](https://github.com/vbfox/ColoredPrintf/issues/2))
+* Honor the [`NO_COLOR`](https://no-color.org) and [`FORCE_COLOR`](https://force-color.org) environment variable conventions
+
 ### New in 2.0.1
 
 * Bump MasterOfFoo minimal version to 2.1.2

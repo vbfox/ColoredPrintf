@@ -17,6 +17,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="ColorStrings.fs" />
     <Compile Include="ColoredWriter.fs" />
+    <Compile Include="ColorSupport.fs" />
     <Compile Include="ColoredPrintf.fs" />
   </ItemGroup>
   <ItemGroup>

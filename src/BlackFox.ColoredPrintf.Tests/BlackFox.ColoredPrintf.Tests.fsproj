@@ -13,6 +13,7 @@
     <None Include="paket.references" />
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="TestWriter.fs" />
+    <Compile Include="ColorSupportTests.fs" />
     <Compile Include="SimpleTests.fs" />
     <Compile Include="IssuesRepro.fs" />
     <Compile Include="Program.fs" />

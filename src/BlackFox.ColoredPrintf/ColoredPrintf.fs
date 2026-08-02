@@ -9,7 +9,7 @@ open BlackFox.ColoredPrintf.ColoredWriter
 type private ConsoleColoredPrinterEnv() =
     let mutable fg = ConsoleColor.White
     let mutable bg = ConsoleColor.Black
-    let mutable colorDisabled = false
+    let mutable colorDisabled = not (ColorSupport.supportsColor())
     let wrap f =
         if not colorDisabled then
             try f()
@@ -33,12 +33,12 @@ type private ConsoleColoredPrinterEnv() =
                 bg <- c
                 wrap(fun _ -> Console.BackgroundColor <- c)
 
-let consoleColorType = typeof<ConsoleColor>
+let private consoleColorType = typeof<ConsoleColor>
 
 /// Extracts a ConsoleColor instance from the element
 ///
 /// Handle both sprintf style format where the type is available in ValueType and .NET style format where it isn't
-let extractConsoleColor (s : PrintableElement) =
+let private extractConsoleColor (s : PrintableElement) =
     if consoleColorType.Equals(s.ValueType) then
         // sprintf style: $"%A{ConsoleColor.Red}"
         Some (s.Value :?> ConsoleColor)
@@ -93,4 +93,3 @@ let colorprintf<'T> (format: ColorPrintFormat<'T>) =
 let colorprintfn<'T> (format: ColorPrintFormat<'T>) =
     let writeLine () = Console.WriteLine()
     doPrintfFromEnv format (ColoredConsolePrintEnv(ConsoleColoredPrinterEnv(), writeLine))
-
