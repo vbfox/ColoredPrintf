@@ -19,10 +19,8 @@ jobs:
     - name: Install legacy libssl (required by netcoreapp2.0 test runtime)
       run: |
         wget -q http://launchpadlibrarian.net/555132422/libssl1.0.0_1.0.2n-1ubuntu5.7_amd64.deb
-        wget -q http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb
         sudo dpkg -i libssl1.0.0_1.0.2n-1ubuntu5.7_amd64.deb
-        sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb
-        rm libssl1.0.0_1.0.2n-1ubuntu5.7_amd64.deb libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb
+        rm libssl1.0.0_1.0.2n-1ubuntu5.7_amd64.deb
     - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
       with:
         dotnet-version: |
