@@ -74,6 +74,9 @@ type internal ColoredConsolePrintEnv<'Result>(env: IColoredPrinterEnv, k) =
     override __.WriteT(s : string) =
         env.Write(s)
 
+/// Format string type accepted by <see cref="colorprintf"/> and <see cref="colorprintfn"/>,
+/// supporting both `printf`-style format specifiers and the `$foreground;background[text]`
+/// color syntax.
 type ColorPrintFormat<'T> = Format<'T, unit, string, unit>
 
 /// I'm so <c>.Net</c> very using <paramref name="s" />
@@ -87,9 +90,14 @@ type ColorPrintFormat<'T> = Format<'T, unit, string, unit>
 /// </example>
 let foo = ()
 
+/// Print a colored, formatted string to the console, using the `$foreground;background[text]`
+/// syntax to change colors (both parts are optional, e.g. `$red[...]` or `$;red[...]`).
 let colorprintf<'T> (format: ColorPrintFormat<'T>) =
     doPrintfFromEnv format (ColoredConsolePrintEnv(ConsoleColoredPrinterEnv(), id))
 
+    /// Print a colored, formatted string to the console with a trailing newline, using
+    /// the `$foreground;background[text]`syntax to change colors (both parts are optional,
+    /// e.g. `$red[...]` or `$;red[...]`).
 let colorprintfn<'T> (format: ColorPrintFormat<'T>) =
     let writeLine () = Console.WriteLine()
     doPrintfFromEnv format (ColoredConsolePrintEnv(ConsoleColoredPrinterEnv(), writeLine))
