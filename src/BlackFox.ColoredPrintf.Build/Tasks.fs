@@ -17,6 +17,16 @@ open System.Xml.Linq
 
 let testProjectName = "BlackFox.ColoredPrintf.Tests"
 
+let private isNetCoreAppRuntimeAvailable (major: string) =
+    let psi = System.Diagnostics.ProcessStartInfo("dotnet", "--list-runtimes")
+    psi.RedirectStandardOutput <- true
+    psi.UseShellExecute <- false
+    use p = System.Diagnostics.Process.Start(psi)
+    let output = p.StandardOutput.ReadToEnd()
+    p.WaitForExit()
+    output.Split('\n')
+    |> Array.exists (fun line -> line.StartsWith(sprintf "Microsoft.NETCore.App %s." major))
+
 let createAndGetDefault () =
     let configuration = Environment.environVarOrDefault "configuration" "Release"
     let fakeConfiguration =
@@ -95,7 +105,14 @@ let createAndGetDefault () =
 
     let runTests = BuildTask.create "RunTests" [build] {
         let baseTestDir = artifactsDir </> testProjectName </> (string configuration)
-        let testConfs = ["netcoreapp2.0", ".dll"; "net10.0", ".dll"]
+        let isCI = BuildServer.buildServer <> BuildServer.LocalBuild
+
+        let testConfs =
+            if not isCI && not (isNetCoreAppRuntimeAvailable "2") then
+                Trace.traceImportant "netcoreapp2.0 runtime not found locally, skipping its tests (this would be a hard error on CI)"
+                ["net10.0", ".dll"]
+            else
+                ["netcoreapp2.0", ".dll"; "net10.0", ".dll"]
 
         testConfs
         |> List.map (fun (fw, ext) -> baseTestDir </> fw </> (testProjectName + ext))
