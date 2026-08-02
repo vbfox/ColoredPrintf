@@ -95,7 +95,7 @@ let createAndGetDefault () =
 
     let runTests = BuildTask.create "RunTests" [build] {
         let baseTestDir = artifactsDir </> testProjectName </> (string configuration)
-        let testConfs = ["netcoreapp2.0", ".dll"; "net5.0", ".dll"]
+        let testConfs = ["netcoreapp2.0", ".dll"; "net10.0", ".dll"]
 
         testConfs
         |> List.map (fun (fw, ext) -> baseTestDir </> fw </> (testProjectName + ext))

@@ -16,7 +16,7 @@ jobs:
       PAKET_SKIP_RESTORE_TARGETS: true
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-    - name: Install legacy libssl (required by netcoreapp2.0/net5.0 test runtimes)
+    - name: Install legacy libssl (required by netcoreapp2.0 test runtime)
       run: |
         wget -q http://launchpadlibrarian.net/555132422/libssl1.0.0_1.0.2n-1ubuntu5.7_amd64.deb
         wget -q http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb
@@ -27,7 +27,7 @@ jobs:
       with:
         dotnet-version: |
           2
-          5
+          10
     - name: Restore packages
       run: ./paket.sh restore
     - name: Compile build script
@@ -47,7 +47,7 @@ jobs:
       with:
         dotnet-version: |
           2
-          5
+          10
     - name: Restore packages
       run: ./paket.cmd restore
     - name: Compile build script

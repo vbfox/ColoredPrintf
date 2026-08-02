@@ -1,5 +1,5 @@
 source https://api.nuget.org/v3/index.json
-framework: net8.0,net5.0,netcoreapp2.0,netstandard2.0,net461
+framework: net10.0,netcoreapp2.0,netstandard2.0,net461
 storage:none
 
 nuget Expecto ~> 9
@@ -10,7 +10,7 @@ nuget FSharp.Data prerelease
 group build
     source https://api.nuget.org/v3/index.json
     storage: none
-    framework: net8.0
+    framework: net10.0
 
     nuget FSharp.Core ~> 5
     nuget BlackFox.Fake.BuildTask
