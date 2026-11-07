@@ -119,13 +119,22 @@ let createAndGetDefault () =
             else
                 ["netcoreapp2.0", ".dll"; "net10.0", ".dll"]
 
-        testConfs
-        |> List.map (fun (fw, ext) -> baseTestDir </> fw </> (testProjectName + ext))
-        |> Expecto.run (fun p ->
-            { p with
-                PrintVersion = false
-                FailOnFocusedTests = true
-            })
+        for (fw, ext) in testConfs do
+            // The netcoreapp2.0 runtime only knows a fixed list of ICU versions and crashes on
+            // startup on recent distributions (e.g. ubuntu-26.04), the tests don't depend on
+            // culture data so run them without globalization support.
+            let invariantVar = "DOTNET_SYSTEM_GLOBALIZATION_INVARIANT"
+            let useInvariant = fw = "netcoreapp2.0"
+            if useInvariant then System.Environment.SetEnvironmentVariable(invariantVar, "1")
+            try
+                [baseTestDir </> fw </> (testProjectName + ext)]
+                |> Expecto.run (fun p ->
+                    { p with
+                        PrintVersion = false
+                        FailOnFocusedTests = true
+                    })
+            finally
+                if useInvariant then System.Environment.SetEnvironmentVariable(invariantVar, null)
 
         for (fw, _) in testConfs do
             let dir = baseTestDir </> fw
